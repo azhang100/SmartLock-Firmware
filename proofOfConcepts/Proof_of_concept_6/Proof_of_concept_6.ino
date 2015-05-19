@@ -1,8 +1,8 @@
 #include <Servo.h> 
 #include <SoftwareSerial.h>
 
-int bluetoothRx = 2;
-int bluetoothTx = 3;  
+int bluetoothRx = 3;
+int bluetoothTx = 4;  
 
 SoftwareSerial bluetooth(bluetoothRx, bluetoothTx);
 

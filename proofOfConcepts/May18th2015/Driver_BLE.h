@@ -1,39 +1,28 @@
-
 //**********************************************************************************************//
 //					DEFINES						 	//
 //**********************************************************************************************//
 
-#define		MAX_ANGLE	180		//Motor Max Rotation Angle
-#define		MIN_ANGLE	0		//Motor Min Rotation Angle
-#define		OPEN_ANGLE	120		//Close angle for the door lock
-#define		CLOSE_ANGLE	0		//Open angle for the door lock
+#define		ARDUINO_RX_BLE_TX          3               //make pin 3 of arduino as RX and map it to TX of BLE
+#define		ARDUINO_TX_BLE_RX          4               //make pin 4 of arduino as TX and map it to RX of BLE
+
 
 //**********************************************************************************************//
 //					GLOBAL VARIABLES				 	//
 //**********************************************************************************************//
 
+SoftwareSerial BLE = SoftwareSerial(ARDUINO_RX_BLE_TX, ARDUINO_TX_BLE_RX); // RX, TX of arduino 
+
 //**********************************************************************************************//
 //				   FUNCTIONS DECLARATIONS				 	//
 //**********************************************************************************************//
 
-char getPosition();			//Gives the position whether [Closed:Open:Intermediate]
+void BLE_init();                        //BLE initialization
 
 //**********************************************************************************************//
 //					FUNCTIONS					 	//
 //**********************************************************************************************//
 
-
-
-/*
-	Returns the the position of the (open, closed, unknown) of the knob
-*/
-char getPosition(){ 
-  char pos = 'j';
-  int angle=getAngle();
-  if (angle <= CLOSE_ANGLE) {pos = 'c';}
-  else if (angle >= OPEN_ANGLE) {pos = 'o';}
-  //if (angle < closedPot()) {pos = 'c';}
-  //else if (angle > openPot()) {pos = 'o';}
-  else {pos = 'm';}
-  return pos;
+void BLE_init()
+{
+  BLE.begin(9600); // set baud rate for main communication port
 }

@@ -22,7 +22,7 @@ void BLE_init();                        //BLE initialization
 //					FUNCTIONS					 	//
 //**********************************************************************************************//
 
-void BLE_init(){
+void BLE_init()
+{
   BLE.begin(9600); // set baud rate for main communication port
-  Serial.begin(9600); // set baud rate for debugging port
 }
