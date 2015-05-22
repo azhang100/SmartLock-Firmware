@@ -1,4 +1,5 @@
 
+#include "MPU6050_Lib.h"
 //**********************************************************************************************//
 //					DEFINES						 	//
 //**********************************************************************************************//
@@ -14,7 +15,7 @@
 #define         MOTOR_DUTY_BUFFER       80            // Inputs with absolute value below this number are ignored
                                                       // Anyways the motor can't anything worthwhile with such less power
                                                       
-#define         MOTOR_ANGLE_BUFFER      17             // Inputs with absolute value below this number are ignored
+#define         MOTOR_ANGLE_BUFFER      5             // Inputs with absolute value below this number are ignored
                                                       // the motor rotates 16 to 17 degrees additional angle after slow stopping.
                                                         
 //**********************************************************************************************//

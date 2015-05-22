@@ -13,18 +13,8 @@
 #include "Driver_Memory.h"
 
 // ============Accelerometer============
-#include "I2Cdev.h"
-#include "MPU6050_6Axis_MotionApps20.h"
-//#include "MPU6050.h" // not necessary if using MotionApps include file
 
-// Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
-// is used in I2Cdev.h
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    #include "Wire.h"
-#endif
-
-#include "Driver_Accel.h"
-
+#include "Wire.h"
 // ============Motor============
 #include "Driver_Motor.h"
 
@@ -58,7 +48,7 @@ void setup()
   Serial.begin(9600);
   BLE_init();
   Motor_init();
-  Accel_init();
+  accel_init();
 }
 
 
