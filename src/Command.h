@@ -21,12 +21,6 @@ the lock figures out the direction of lock/unlock.
 //					GLOBAL VARIABLES				 	//
 //**********************************************************************************************//
 
-String inputString = "";
-String command = "";
-String value = "";
-boolean stringComplete = false;
-
-
 
 //**********************************************************************************************//
 //					FUNCTIONS					 	//
@@ -35,9 +29,12 @@ boolean stringComplete = false;
 
 void executeCommandFromUser()
 {
+String command = "";
+String value = "";
+String inputString = inputCommand;
 float angleFromAccelerometer = getAngle();
 
-if (stringComplete) {
+if (commandAvailable) {
     boolean stringOK = false;
     if (inputString.startsWith("CFG ")) 
     {
@@ -47,7 +44,7 @@ if (stringComplete) {
         if (pos > -1) 
         {
           command = inputString.substring(0, pos);
-          value = inputString.substring(pos+1, inputString.length()-2);  // extract command up to ; excluded
+          value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
           if (command.equals("Power")) { // set the power
               theMotorConfig.power = value.toInt();
                Serial.println(command);
@@ -81,7 +78,7 @@ if (stringComplete) {
       int pos = inputString.indexOf('=');
       if (pos > -1) {
         command = inputString.substring(0, pos);
-        value = inputString.substring(pos+1, inputString.length()-2);  // extract command up to ; excluded
+        value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
          Serial.println(command);
          Serial.println(value);
         if (command.equals("LockCMD")) { // lock or unlock 
@@ -97,11 +94,15 @@ if (stringComplete) {
           BLE.println("Unlocked");  
         stringOK = true;
       }
+      else if (inputString.startsWith("test")) {
+        test12000();  
+        stringOK = true;
+      }
     
     // stringOK ? Serial.println("Command Executed") : Serial.println("Invalid Command");
     // clear the string for next iteration
     inputString = "";
-    stringComplete = false;
+    commandAvailable = false;
   } // stringComplete
   
 

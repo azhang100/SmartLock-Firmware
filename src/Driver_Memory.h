@@ -16,6 +16,9 @@
 
 bool isLocked=false;
 
+String inputCommand = "";
+bool commandAvailable = false;
+
 class MotorConfig
 {
   
@@ -33,7 +36,7 @@ class MotorConfig
     
     MotorConfig()
     {
-      turnDirection = 1; // clockwise turn to lock, anti clockwise turn to unlock
+      turnDirection = -1; // clockwise turn to lock, anti clockwise turn to unlock
       unlockedAngle = 180;
       lockedAngle = 70;
       power = 255; // ranges from 50 to 255
@@ -74,5 +77,8 @@ class MotorConfig
 
 };
 
-
+void storeCommand(String inputString)
+{
+  inputCommand = inputString;
+}
 

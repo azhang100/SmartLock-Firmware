@@ -99,7 +99,19 @@ void controlMotor(char command)
   
 }
 
-
+void test12000()
+{
+  int count = 0;
+  while(1)
+  {
+  controlMotor('u');
+  delay(4000);
+  controlMotor('l');
+  delay(4000);
+  writeToBLE(count);
+  count = count+1;
+  }
+}
 
 // actual motor driver function
 void motorOut(int rotationalVelocity){

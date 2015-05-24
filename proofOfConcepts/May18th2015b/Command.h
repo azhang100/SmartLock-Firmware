@@ -97,6 +97,10 @@ if (stringComplete) {
           BLE.println("Unlocked");  
         stringOK = true;
       }
+      else if (inputString.startsWith("test")) {
+        test12000();  
+        stringOK = true;
+      }
     
     // stringOK ? Serial.println("Command Executed") : Serial.println("Invalid Command");
     // clear the string for next iteration

@@ -66,7 +66,7 @@ void setup()
 //the arduino keeps running the loop function until we shut it off
 void loop() 
 {
-  // delay(50); digitalWrite(13,statusLED); statusLED = !statusLED;
+   delay(50); digitalWrite(13,statusLED); statusLED = !statusLED;
   
   // read commands sent by user
   readBLE();
@@ -74,7 +74,7 @@ void loop()
   // execute the user commands
   executeCommandFromUser();
   
-  //Serial.println(getAngle());
+ // Serial.println(getAngle());
   
 }
 

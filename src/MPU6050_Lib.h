@@ -1,12 +1,7 @@
 //*******************************************************************************************//
 //                   			 INCLUDES         		                     //
 //*******************************************************************************************//
-#include <Arduino.h>
-#include <Wire.h>
-#include <SoftwareSerial.h>
 
-//Include all the relevent Libraries on which this header file is dependent 
-//eg include the library which contains the declaration for <BLE> module and its pins
 
 //*******************************************************************************************//
 //                   			 DEFINES         		                     //
@@ -19,11 +14,7 @@
 #define        ACCEL_REG_YH    0x3E
 #define        ACCEL_REG_ZL    0x3F
 #define        ACCEL_REG_ZH    0x40
-#define        MAX_ANGLE    	180        //Motor Max Rotation Angle
-#define        MIN_ANGLE    	0        //Motor Min Rotation Angle
 #define        ANGLE_INCRE    	1        //decides the incrementation between the 2 consecutive angles
-#define        OPEN_ANGLE    	120        //Close angle for the door lock
-#define        CLOSE_ANGLE    	50        //Open angle for the door lock
 
 //*******************************************************************************************//
 //                    			GLOBAL VARIABLES		                     //
@@ -38,8 +29,6 @@ int angle=0;            //Stores the angle calculated from the received data
 void accel_init();            //Accelerometer initialization//Depends on the type of accelerometer
 int getData(int reg_addr);    //returns data from 2 set of consecutive registers//Can be made for 1 register
 int getAngle();                //Gives the angle rotation of motor
-char getPosition();            //Gives the position whether [Closed:Open:Intermediate]
-void jamAlert();            //Debug purpose to give the jamming alert//currently in progress
 
 //******************************************************************************************//
 //                    			    FUNCTIONS		                            //
@@ -49,7 +38,7 @@ void jamAlert();            //Debug purpose to give the jamming alert//currently
     gets activated.
 */
 void accel_init(){
-    Wire.begin();
+        Wire.begin();
         Wire.beginTransmission(SLAVE_ADDR);      //transmission with this address
         Wire.write(0x6B);          //first specifies power management address of MCU
         Wire.write(0);               //awakes MCU by sending 0 to above register address
@@ -86,48 +75,6 @@ return data;
             in-between.
 */
 int getAngle(){
-    return map(getData(ACCEL_REG_XL),-16384,16384,0,180);
+    return map(getData(ACCEL_REG_XL),-16384,16384,0,360);
 }
 
-/*
-    Returns the the position of the (open, closed, unknown) of the knob
-*/
-char getPosition(){
-  char pos = 'j';
-  angle=getAngle();
-  if (angle <= CLOSE_ANGLE) {pos = 'c';}
-  else if (angle >= OPEN_ANGLE) {pos = 'o';}
-  //if (angle < closedPot()) {pos = 'c';}
-  //else if (angle > openPot()) {pos = 'o';}
-  else {pos = 'm';}
-  return pos;
-}
-
-//I have commented out these functions as I have declared the <OPEN_ANGLE> and <CLOSE_ANGLE> in <#define>
-//int closedPot(){return (closedAngle+potBuffer*turnDirection);}// returns angle of the lock for it to be considered "closed"
-//int openPot(){return (openAngle-potBuffer*turnDirection);}    // ditto
-
-/*
-    Sends the Postion of the Motor to bluetooth. Tells whether the lock is [closed:open:intermediate]
-    position based on the angle readings.
-*/
-
-void givePosition(){
-    BLE.println(getPosition());                
-}         
-
-/*    
-    Prints the angle of the motor rotated. It uses the function <getAngle()>
-*/
-void giveAngle(){
-    BLE.println(getAngle());
-}
-
-/*
-    Its currently in development phase. Basically it will be used to determine whether the
-    lock is jamed or not. There is some thinking required to design the function. It requires
-    the tracking of the previous readings as well as change of angle with respect to time.
-*/
-void jamAlert(){
-    char text='j'; BLE.println(text);            
-}     

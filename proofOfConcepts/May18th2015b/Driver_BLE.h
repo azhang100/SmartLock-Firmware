@@ -26,3 +26,7 @@ void BLE_init()
 {
   BLE.begin(9600); // set baud rate for main communication port
 }
+
+void writeToBLE(int count) {
+  BLE.println(count);
+}

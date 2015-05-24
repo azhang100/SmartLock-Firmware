@@ -17,6 +17,7 @@ SoftwareSerial BLE = SoftwareSerial(ARDUINO_RX_BLE_TX, ARDUINO_TX_BLE_RX); // RX
 //**********************************************************************************************//
 
 void BLE_init();                        //BLE initialization
+void readBLE();
 
 //**********************************************************************************************//
 //					FUNCTIONS					 	//
@@ -25,4 +26,30 @@ void BLE_init();                        //BLE initialization
 void BLE_init()
 {
   BLE.begin(9600); // set baud rate for main communication port
+}
+
+void readBLE() {
+  
+  String inputString = "";
+  while (BLE.available()) {
+    // get the new byte:
+    char inChar = (char)BLE.read(); 
+    //Serial.write(inChar);
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a semi colon, set a flag
+    // so the main loop can do something about it:
+    if (inChar == ';') {
+//      int pos = inputString.indexOf(';');
+//      inputString[pos+1] = '\n';
+      commandAvailable = true;
+      Serial.println(inputString);
+      storeCommand(inputString);
+    } 
+  }
+  
+}
+
+void writeToBLE(int count) {
+  BLE.println(count);
 }
