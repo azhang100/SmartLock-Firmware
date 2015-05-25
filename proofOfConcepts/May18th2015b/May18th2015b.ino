@@ -74,7 +74,8 @@ void loop()
   // execute the user commands
   executeCommandFromUser();
   
- // Serial.println(getAngle());
+ Serial.println(getAngle());
+ BLE.println(getAngle());
   
 }
 

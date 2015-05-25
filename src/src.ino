@@ -1,4 +1,10 @@
 //**********************************************************************************************//
+//					DEFINES						 	//
+//**********************************************************************************************//
+
+#define		BAUD_RATE          9600
+
+//**********************************************************************************************//
 //					IMPORTS						 	//
 //**********************************************************************************************//
 
@@ -16,7 +22,7 @@
 #include "MPU6050_Lib.h"
 
 // ============Motor============
-#include "Driver_Motor.h"
+#include "Motor_Controller.h"
 
 // ============Execute USer Commands============
 #include "Command.h"
@@ -43,14 +49,14 @@ int statusLED = true;
 //The arduino runs the setup function first
 void setup() 
 {
-//     Serial.println("start of loop1");
+//     Serial.println("start of setup");
   pinMode(13,OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(BAUD_RATE);
   BLE_init();
   motor_init();
-  //   Serial.println("start of loop2");
+  //   Serial.println("after motor init");
   accel_init();
-    // Serial.println("start of loop3");
+    // Serial.println("after accel init");
 }
 
 
@@ -58,16 +64,18 @@ void setup()
 //the arduino keeps running the loop function until we shut it off
 void loop() 
 {
- //  Serial.println("start of loop4");
-   delay(50); digitalWrite(13,statusLED); statusLED = !statusLED;
+  //  Serial.println("start of loop");
+  delay(50); digitalWrite(13,statusLED); statusLED = !statusLED;
   
   // read commands sent by user
   readBLE();
-   //  Serial.println("start of loop5");
+  //  Serial.println("after readBLE");
+   
   // execute the user commands
   executeCommandFromUser();
 
-  // Serial.println("start of loop6");
+
+  // Serial.println("end of loop");
   Serial.println(getAngle());
   
 }

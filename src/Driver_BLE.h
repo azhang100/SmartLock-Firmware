@@ -25,7 +25,7 @@ void readBLE();
 
 void BLE_init()
 {
-  BLE.begin(9600); // set baud rate for main communication port
+  BLE.begin(BAUD_RATE); // set baud rate for main communication port
 }
 
 void readBLE() {

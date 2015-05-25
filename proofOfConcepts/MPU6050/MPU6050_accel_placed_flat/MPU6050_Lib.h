@@ -37,7 +37,7 @@
 void accel_init();            //Accelerometer initialization//Depends on the type of accelerometer
 int getData(int reg_addr);    //returns data from 2 set of consecutive registers//Can be made for 1 register
 float getAngle();                //Gives the angle rotation of motor
-
+char getPosition();            //Gives the position whether [Closed:Open:Intermediate]
 
 //******************************************************************************************//
 //                    			    FUNCTIONS		                            //
@@ -93,5 +93,3 @@ float getAngle(){
   
 }
 
-
-#endif
