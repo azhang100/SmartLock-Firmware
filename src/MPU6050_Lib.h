@@ -5,7 +5,6 @@
 //*******************************************************************************************//
 #include <Arduino.h>
 #include <Wire.h>
-#include <SoftwareSerial.h>
 
 //Include all the relevent Libraries on which this header file is dependent 
 //eg include the library which contains the declaration for <BLE> module and its pins
@@ -21,12 +20,9 @@
 #define        ACCEL_REG_YH    0x3E
 #define        ACCEL_REG_ZL    0x3F
 #define        ACCEL_REG_ZH    0x40
-#define        MAX_ANGLE    	180        //Motor Max Rotation Angle
-#define        MIN_ANGLE    	0        //Motor Min Rotation Angle
 #define        ANGLE_INCRE    	1        //decides the incrementation between the 2 consecutive angles
-#define        OPEN_ANGLE    	120        //Close angle for the door lock
-#define        CLOSE_ANGLE    	50        //Open angle for the door lock
 #define        PI               3.14
+#define        ACCEL_SLP        7          // bring up to turn on accelerator
 
 //#define        ANG_JUMP         140       //Angle Jump due to atan mapping//at its discontinuous points
 
@@ -36,8 +32,7 @@
 //*******************************************************************************************//
 void accel_init();            //Accelerometer initialization//Depends on the type of accelerometer
 int getData(int reg_addr);    //returns data from 2 set of consecutive registers//Can be made for 1 register
-float getAngle();                //Gives the angle rotation of motor
-
+int getAngle();                //Gives the angle rotation of motor
 
 //******************************************************************************************//
 //                    			    FUNCTIONS		                            //
@@ -47,6 +42,10 @@ float getAngle();                //Gives the angle rotation of motor
     gets activated.
 */
 void accel_init(){
+  
+    pinMode(ACCEL_SLP,OUTPUT);
+    digitalWrite(ACCEL_SLP,HIGH);
+  
     Wire.begin();
         Wire.beginTransmission(SLAVE_ADDR);      //transmission with this address
         Wire.write(0x6B);          //first specifies power management address of MCU
@@ -83,7 +82,7 @@ return data;
             get mapped to toLow, a value of fromHigh to toHigh, values in-between to values
             in-between.
 */
-float getAngle(){
+int getAngle(){
   int curAngle;
   //curAngle=map(getData(ACCEL_REG_XL),-16384,16384,0,180);
   curAngle=(180*atan(((float)getData(ACCEL_REG_XL))/getData(ACCEL_REG_YL))/PI)+90;

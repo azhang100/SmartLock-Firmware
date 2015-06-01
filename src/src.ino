@@ -11,11 +11,11 @@
 // =============Arduino============
 #import <Arduino.h>
 #include <Wire.h>
+
 // ============Memory============
 #include "Driver_Memory.h"
 
 // =============BLE============
-#include <SoftwareSerial.h>
 #include "Driver_BLE.h"
 
 // =============Accelerometer============
@@ -27,19 +27,15 @@
 // ============Execute USer Commands============
 #include "Command.h"
 
-
 //**********************************************************************************************//
 //					GLOBAL VARIABLES				 	//
 //**********************************************************************************************//
 
 int statusLED = true;
 
-
 //**********************************************************************************************//
 //				   FUNCTIONS DECLARATIONS				 	//
 //**********************************************************************************************//
-
-
 
 //**********************************************************************************************//
 //					SETUP AND LOOP					 	//
@@ -51,6 +47,8 @@ void setup()
 {
 //     Serial.println("start of setup");
   pinMode(13,OUTPUT);
+  pinMode(12,OUTPUT);
+  pinMode(11,OUTPUT);
   Serial.begin(BAUD_RATE);
   BLE_init();
   motor_init();
@@ -58,8 +56,6 @@ void setup()
   accel_init();
     // Serial.println("after accel init");
 }
-
-
 
 //the arduino keeps running the loop function until we shut it off
 void loop() 

@@ -15,8 +15,6 @@ the lock figures out the direction of lock/unlock.
 
 */
 
-
-
 //**********************************************************************************************//
 //					GLOBAL VARIABLES				 	//
 //**********************************************************************************************//
@@ -44,7 +42,7 @@ if (commandAvailable) {
         if (pos > -1) 
         {
           command = inputString.substring(0, pos);
-          value = inputString.substring(pos+1, inputString.length()-2);  // extract command up to ; excluded
+          value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
           if (command.equals("Power")) { // set the power
               theMotorConfig.power = value.toInt();
                Serial.println(command);
@@ -78,7 +76,7 @@ if (commandAvailable) {
       int pos = inputString.indexOf('=');
       if (pos > -1) {
         command = inputString.substring(0, pos);
-        value = inputString.substring(pos+1, inputString.length()-2);  // extract command up to ; excluded
+        value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
          Serial.println(command);
          Serial.println(value);
         if (command.equals("LockCMD")) { // lock or unlock 
@@ -89,9 +87,9 @@ if (commandAvailable) {
     }
     else if (inputString.startsWith("LOCKSTATUS")) {
         if(isLocked)
-          BLE.println("Locked");
+          Serial.println("Locked");
         else
-          BLE.println("Unlocked");  
+          Serial.println("Unlocked");  
         stringOK = true;
       }
       else if (inputString.startsWith("test")) {
