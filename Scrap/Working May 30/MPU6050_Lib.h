@@ -3,6 +3,11 @@
 //*******************************************************************************************//
 //                   			 INCLUDES         		                     //
 //*******************************************************************************************//
+#include <Arduino.h>
+#include <Wire.h>
+
+//Include all the relevent Libraries on which this header file is dependent 
+//eg include the library which contains the declaration for <BLE> module and its pins
 
 //*******************************************************************************************//
 //                   			 DEFINES         		                     //

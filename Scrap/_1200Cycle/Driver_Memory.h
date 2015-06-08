@@ -15,7 +15,6 @@
 //EEPROM.write(address, val);
 
 bool isLocked=false;
-bool commandAvailable = false;
 
 class MotorConfig
 {
@@ -74,4 +73,6 @@ class MotorConfig
     }
 
 };
+
+
 
