@@ -15,6 +15,8 @@
 //EEPROM.write(address, val);
 
 bool isLocked=false;
+
+String inputCommand = "";
 bool commandAvailable = false;
 
 class MotorConfig
@@ -74,4 +76,9 @@ class MotorConfig
     }
 
 };
+
+void storeCommand(String inputString)
+{
+  inputCommand = inputString;
+}
 

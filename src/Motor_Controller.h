@@ -108,3 +108,21 @@ void rotateMotor360()
     }
   }
 }
+
+
+
+void test12000()
+{
+  int count = 0;
+  while(1)
+  {
+  controlMotor('u');
+  delay(3000);
+  controlMotor('l');
+  delay(3000);
+  writeToBLE(count);
+  count = count+1;
+  }
+}
+
+
