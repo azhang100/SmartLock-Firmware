@@ -19,11 +19,6 @@ the lock figures out the direction of lock/unlock.
 //					GLOBAL VARIABLES				 	//
 //**********************************************************************************************//
 
-//**********************************************************************************************//
-//				   FUNCTIONS DECLARATIONS				 	//
-//**********************************************************************************************//
-
-void executeCommandFromUser(String inputString);
 
 //**********************************************************************************************//
 //					FUNCTIONS					 	//
@@ -34,6 +29,7 @@ void executeCommandFromUser(String inputString)
 {
 String command = "";
 String value = "";
+float angleFromAccelerometer = getAngle();
 
   boolean stringOK = false;
   if (inputString.startsWith("CFG ")) 
@@ -46,7 +42,7 @@ String value = "";
         command = inputString.substring(0, pos);
         value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
         if (command.equals("Power")) { // set the power
-            settings.power.setData(value.toInt());
+            theMotorConfig.power = value.toInt();
              Serial.println(command);
              Serial.println(value);
             stringOK = true;
@@ -60,11 +56,11 @@ String value = "";
         Serial.println(command);
         
         if (command.equals("LockedAngle")) { // set the LockedAngle
-          settings.lockedAngle.setData(getAngle());
+          theMotorConfig.lockedAngle = angleFromAccelerometer;
           stringOK = true;
         }
         else if (command.equals("UnlockedAngle")) { // set the UnlockedAngle
-          settings.unlockedAngle.setData(getAngle());
+          theMotorConfig.unlockedAngle = angleFromAccelerometer;
           stringOK = true;
         }
         

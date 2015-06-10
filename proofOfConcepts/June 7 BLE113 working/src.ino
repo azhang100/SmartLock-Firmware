@@ -12,10 +12,13 @@
 #include <SoftwareSerial.h>
 
 // ============Memory============
-#include <EEPROM.h>
-#include "Driver_EEPROM.h"
+#include "Driver_Memory.h"
 
-// =============BLE===========
+// =============BLE============
+// =============Arduino============
+#import <Arduino.h>
+#include <Wire.h>
+#include <SoftwareSerial.h>
 #include "Driver_BLE.h"
 
 // =============Accelerometer============
@@ -23,10 +26,6 @@
 
 // ============Motor============
 #include "Motor_Controller.h"
-
-// ============Sleep============
-#include <avr/sleep.h>
-#include "Driver_Sleep.h"
 
 // ============Execute USer Commands============
 #include "Command.h"
@@ -41,9 +40,6 @@ int loopCount=0; // to slow down blinking
 //**********************************************************************************************//
 //				   FUNCTIONS DECLARATIONS				 	//
 //**********************************************************************************************//
-
-void setup();
-void loop();
 
 //**********************************************************************************************//
 //					SETUP AND LOOP					 	//
@@ -78,15 +74,12 @@ void setup()
 void loop()
 {
   delay(1);
-  loopCount++;
-  sleepCount++;
-  
-  if (loopCount == 200){
+  loopCount = loopCount + 1;
+  if (loopCount == 500){
     loopCount = 0;
     statusLED = !statusLED;
     digitalWrite(13,statusLED);
     Serial.print("Current Orientation: ");Serial.println(getAngle());
-    Serial.print("Awake for: "); Serial.print(sleepCount); Serial.println(" loops");
   }
   
   // read commands sent by user
@@ -95,11 +88,7 @@ void loop()
     Serial.print("Got Command: ");Serial.println(command);
     // execute the user commands
     executeCommandFromUser(command);
-    resetSleepCounter();
   }
-  
-  if (sleepCount >= sleepCountMax){sleep();}
-  
 }
 
 //**********************************************************************************************//

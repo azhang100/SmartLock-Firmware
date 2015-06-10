@@ -1,5 +1,13 @@
 #ifndef _MPU6050_SIMPLELIB_H
 #define _MPU6050_SIMPLELIB_H
+//*******************************************************************************************//
+//                   			 INCLUDES         		                     //
+//*******************************************************************************************//
+#include <Arduino.h>
+#include <Wire.h>
+
+//Include all the relevent Libraries on which this header file is dependent 
+//eg include the library which contains the declaration for <BLE> module and its pins
 
 //*******************************************************************************************//
 //                   			 DEFINES         		                     //
@@ -81,6 +89,8 @@ int getAngle(){
   if(getData(ACCEL_REG_YL)>0) curAngle=180+curAngle;
   
   return curAngle;
+  
 }
+
 
 #endif
