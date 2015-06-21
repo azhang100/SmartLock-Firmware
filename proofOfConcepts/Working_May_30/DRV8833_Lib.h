@@ -6,7 +6,7 @@
 #define HG7881_B_IA 10                                 // 10 --> Motor B Input A --> MOTOR B +
 #define HG7881_B_IB 9                                // 9 --> Motor B Input B --> MOTOR B -
 #define MOTOR_B_SLP                     8             // bring high to activate; will be pulled low
-
+#define DIGI_CURRENT_PIN 15
 // functional connections
 #define MOTOR_B_PWM HG7881_B_IA                       // Motor B PWM Speed
 #define MOTOR_B_DIR HG7881_B_IB                       // Motor B Direction
@@ -31,9 +31,11 @@ void motor_init()
   pinMode( MOTOR_B_DIR, OUTPUT );
   pinMode( MOTOR_B_PWM, OUTPUT );
   pinMode( MOTOR_B_SLP, OUTPUT );
+  pinMode( DIGI_CURRENT_PIN, OUTPUT);
   digitalWrite( MOTOR_B_DIR, LOW );
   digitalWrite( MOTOR_B_PWM, LOW );
   digitalWrite( MOTOR_B_SLP, HIGH);
+  digitalWrite( DIGI_CURRENT_PIN, LOW);
 }
 
 // actual motor driver function
