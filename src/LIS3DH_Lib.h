@@ -1,104 +1,117 @@
-#ifndef _LIS3DH_H
-#define _LIS3DH_H
-//*******************************************************************************************//
-//                   			 INCLUDES         		                     //
-//*******************************************************************************************//
-//Include all the relevent Libraries on which this header file is dependent 
-//eg include the library which contains the declaration for <BLE> module and its pins
+//#include <Wire.h>
 
-//*******************************************************************************************//
-//                   			 DEFINES         		                     //
-//*******************************************************************************************//
+//**********************************************************************************************//
+//					DEFINES						 	//
+//**********************************************************************************************//
 
-#define        SLAVE_ADDR      0b0011000   //Slave address of Accelerometer//If SDO/SA0 is high '1' then the address changes to 0b0011001// If its low then the address is 0b0011000 
-#define        ACCEL_REG_XL    0x28        //Accelerometer axes register which data will be stored
-#define        ACCEL_REG_XH    0x29        //Needs to be changed which depends on Accelerometer
-#define        ACCEL_REG_YL    0x2A
-#define        ACCEL_REG_YH    0x2B
-#define        ACCEL_REG_ZL    0x2C
-#define        ACCEL_REG_ZH    0x2D
-#define        ANGLE_INCRE    	1        //decides the incrementation between the 2 consecutive angles
-#define        PI               3.14
-#define        ERR              .01
+/* 2 Measurement of acceleration values using motion sensor LIS3DH 3 */ 
+#define ADDRESS_LIS3DH 0x18
+#define CTRL_REG1 0x20 
+#define CTRL_REG4 0x23 
+#define CTRL_REG5 0x24 
+#define STATUS_REG 0x27 
+#define OUT_X_L 0x28 
 
-//#define        ANG_JUMP         140       //Angle Jump due to atan mapping//at its discontinuous points
+//**********************************************************************************************//
+//					GLOBAL VARIABLES				 	//
+//**********************************************************************************************//
 
+byte buffer[ 6 ]; 
+byte statusReg; 
+boolean ready = false ; 
+int outX, outY, outZ; 
+int xVal, yVal, zVal; 
 
-//*******************************************************************************************//
-//                   			FUNCTIONS DECLARATIONS                     	     //
-//*******************************************************************************************//
-void accel_init();            //Accelerometer initialization//Depends on the type of accelerometer
-int getData(int reg_addr);    //returns data from 2 set of consecutive registers//Can be made for 1 register
-float getAngle();                //Gives the angle rotation of motor
-float filterData(float *curAngle, float *prevAngle, float *coVar);
+//**********************************************************************************************//
+//				   FUNCTIONS DECLARATIONS				 	//
+//**********************************************************************************************//
 
-//******************************************************************************************//
-//                    			    FUNCTIONS		                            //
-//******************************************************************************************//
-/*
-    Initialialization of TWI [Two wire Interface](I2C) for the Accelerometer so that the I2C pins
-    gets activated.
-*/
+void accel_init();
+int getData();   //updates xVal, yVal, zVal
+int getAngle();  //uses getData() to return the angle
+
+//**********************************************************************************************//
+//					FUNCTIONS					 	//
+//**********************************************************************************************//
+
 void accel_init(){
-    Wire.begin();
-        Wire.beginTransmission(SLAVE_ADDR);      //transmission with this address
-       
-       //Power Management Settings for MPU6050. which is not needed for LIS3DH//
-       /*
-        Wire.write(0x6B);          //first specifies power management address of MCU
-        Wire.write(0);               //awakes MCU by sending 0 to above register address
-        Wire.endTransmission(true);
-        */
-        
-    /* Code to set some initial registers of accelerometer
-       before starting the actual transmission */
-    /* e.g setting the power management setting in MPU 6050
-       and also selecting the desired range of accelerometer
-       which is very essestial part as it determines the
-       resolution of our angle */
-       
+  Wire.begin();
+  delay( 5 ); // 5 ms boot procedure 26 27 // reboot memory content, to make a clean start 28 
+  Wire.beginTransmission(ADDRESS_LIS3DH); 
+  Wire.write(CTRL_REG5); 
+  Wire.write( 0x80 ); 
+  Wire.endTransmission(); 
+  delay( 5 ); // set ODR = 1 Hz, normal mode, x/y/z axis enabled
+  Wire.beginTransmission(ADDRESS_LIS3DH); 
+  Wire.write(CTRL_REG1); 
+  Wire.write( 0x27 ); // 17 = 1, 27 = 10, 47 = 50 Hz
+  Wire.endTransmission(); // set BDU= 1, scale = +/-2g, high resolution enabled 42 
+  Wire.beginTransmission(ADDRESS_LIS3DH); 
+  Wire.write(CTRL_REG4);
+  Wire.write( 0x80 ); 
+  Wire.endTransmission(); 
 }
 
-/*     Function:    The main aim of this function is to give the data stored in particular registers
-    Parameter:    Take the register address from which data has to extracted
-       Retuns:        It returns the data stored in 2 consecutive addresses of accelerometer
-*/
-int getData(int reg_addr){
-    unsigned int data=0;
-    Wire.beginTransmission(SLAVE_ADDR);     //starting the communication again
-      Wire.write(reg_addr);              //start with this register address (its the first data register
-      Wire.endTransmission(false);          //continue to read data
-      Wire.requestFrom(SLAVE_ADDR,2,true);      //request the slave to send the 2 byte data
-      data=Wire.read()<<8|Wire.read();      //data is 16 bit data .the data is automatically read sequently
-
-//Need to add extra loop and code for error codes returned by  Wire.endTransmission//
-    Wire.endTransmission();
-return data;
+int getData(){
+ // read STATUS_REG 
+  while (ready == false ){
+    Wire.beginTransmission(ADDRESS_LIS3DH); 
+    Wire.write(STATUS_REG); 
+    Wire.endTransmission(); 
+    Wire.requestFrom(ADDRESS_LIS3DH, 1 ); 
+    if (Wire.available() >= 1 ){ 
+      statusReg = Wire.read(); 
+    }
+    if (bitRead(statusReg, 3 ) == 1 ){  // new data available 
+      ready = true ; 
+    }
+    delay( 2 );
+  }
+    
+  if (bitRead(statusReg, 7 ) == 1 ){
+     Serial.println( " Some data have been overwritten. " ); 
+  }
+  // read the result 
+  Wire.beginTransmission(ADDRESS_LIS3DH); 
+  Wire.write(OUT_X_L | 0x80 ); // read multiple bytes 
+  Wire.endTransmission(); 
+  Wire.requestFrom(ADDRESS_LIS3DH, 6 );
+  if (Wire.available() >= 6 ){
+    for ( int i = 0 ; i < 6 ; i++ ){
+      buffer[i] = Wire.read(); 
+    }
+  }
+  // calculation 
+  outX = (buffer[ 1 ] << 8 ) | buffer[ 0 ]; 
+  outY = (buffer[ 3 ] << 8 ) | buffer[ 2 ]; 
+  outZ = (buffer[ 5 ] << 8 ) | buffer[ 4 ]; 
+  xVal = outX / 16 ; 
+  yVal = outY / 16 ; 
+  zVal = outZ / 16 ; 
+  
+  /*
+  
+  Serial.print( " outX: " ); 
+  Serial.print(xVal); 
+  Serial.print( " " ); 
+  Serial.print( " outY: " ); 
+  Serial.print(yVal); 
+  Serial.print( " " );
+  Serial.print( " outZ: " ); 
+  Serial.println(zVal); 
+  
+  */
+  
+  ready = false ; 
+  
+  // return [xVal, yVal, zVal]
 }
 
-/*
-    Function:     map(value, fromLow, fromHigh, toLow, toHigh)
-    Description:    Re-maps a number from one range to another.That is,a value of fromLow would
-            get mapped to toLow, a value of fromHigh to toHigh, values in-between to values
-            in-between.
-*/
-float getAngle(){
-  float curAngle;
-  //curAngle=map(getData(ACCEL_REG_XL),-16384,16384,0,180);
-  curAngle=(180*atan(((float)getData(ACCEL_REG_XL))/getData(ACCEL_REG_YL))/PI)+90;
-  if(getData(ACCEL_REG_YL)>0) curAngle=180+curAngle;
+int getAngle(){
+  getData();
+  int curAngle;
+  curAngle=(180*atan(((float)xVal)/yVal)/PI)+90;
+  if(yVal>0) curAngle=180+curAngle;
   
   return curAngle;
-  
 }
-
-float filterData(float *curAngle, float *prevAngle, float *coVar){
-  float kalGain;
-  kalGain=*coVar/(*coVar+ERR);
-  *coVar=(1-kalGain)*(*coVar);
-  *prevAngle=*prevAngle+kalGain*(*curAngle-*prevAngle);
-  return *prevAngle;
-}
-
-
-#endif

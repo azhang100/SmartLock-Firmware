@@ -61,7 +61,7 @@ void sleepNow(){         // here we put the arduino to sleep DO NOT CALL THIS FU
     sleep_enable();          // enables the sleep bit in the mcucr register
                              // so sleep is possible. just a safety pin 
 
-    attachInterrupt(INT_ACCEL, wakeUpNow, LOW); // use interrupt 0 (pin 2) and run function
+    attachInterrupt(INT_ACCEL, wakeUpNow, CHANGE); // use interrupt 0 (pin 2) and run function
                                        // wakeUpNow when pin 2 gets LOW 
     attachInterrupt(INT_BLE, wakeUpNow, LOW); // use interrupt 1 (pin 3) and run function
                                        // wakeUpNow when pin 3 gets LOW                                   
