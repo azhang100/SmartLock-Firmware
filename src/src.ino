@@ -11,12 +11,15 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
+SoftwareSerial debugSerial(0,1);
+
 // ============Memory============
 #include <EEPROM.h>
 #include "Driver_EEPROM.h"
 
-// =============BLE===========
-#include "Driver_BLE.h"
+// =============BT===========
+//#include "Driver_BLE113.h"
+# include "Driver_HC05.h"
 
 // =============Accelerometer============
 //#include "MPU6050_Lib.h"
@@ -34,7 +37,7 @@
 
 //**********************************************************************************************//
 //					GLOBAL VARIABLES				 	//
-//**********************************************************************************************//
+//*****************************************************    *****************************************//
 
 int statusLED = true;
 int loopCount=0; // to slow down blinking
@@ -53,54 +56,59 @@ void loop();
 //The arduino runs the setup function first
 void setup() 
 {
-  Serial.begin(9600);
-  Serial.println("start of setup");
+  debugSerial.begin(9600);
+  debugSerial.println("start of setup");
   
   pinMode(13,OUTPUT);
   pinMode(12,OUTPUT);
   pinMode(11,OUTPUT);
   
-  Serial.println("init accel...");
+  debugSerial.println("init accel...");
   accel_init(); // should be done as early as possible to give it as much time to calibrate
-  Serial.println("done");
+  debugSerial.println("done");
   
-  Serial.println("init ble...");
+  debugSerial.println("init ble...");
   BLE_init();
-  Serial.println("done");
+  debugSerial.println("done");
   
-  Serial.println("init motor...");
+  debugSerial.println("init motor...");
   motor_init();
-  Serial.println("done");
+  debugSerial.println("done");
   
-  Serial.println("setup done");
+  debugSerial.println("setup done");
 }
 
-//the arduino keeps running the loop function until we shut it off
+
 void loop()
 {
   delay(1);
   loopCount++;
-  sleepCount++;
   
   if (loopCount == 200){
+    sleepCount++;
     loopCount = 0;
     statusLED = !statusLED;
     digitalWrite(13,statusLED);
-    Serial.print("Current Orientation: ");Serial.println(getAngle());
-    Serial.print("Awake for: "); Serial.print(sleepCount); Serial.println(" loops");
+    debugSerial.print("Current Orientation: ");debugSerial.println(getAngle());
+    debugSerial.print("Awake for: "); debugSerial.print(sleepCount); debugSerial.println(" loops");
   }
   
-  // read commands sent by user
-  String command=readBLE();
-  if (command.length() > 0){
-    Serial.print("Got Command: ");Serial.println(command);
-    // execute the user commands
-    executeCommandFromUser(command);
-    resetSleepCounter();
-  }
+  String command; // read commands sent by user
+  command=readBLE();
+  recievedCommand(command);
   
   if (sleepCount >= sleepCountMax){sleep();}
   
+}
+
+void recievedCommand(String command){
+  if (command.length() > 0){
+    debugSerial.print("Got Command: ");debugSerial.println(command);
+    // execute the user commands
+    executeCommandFromUser(command);
+    debugCommandFromUser(command);
+    resetSleepCounter();
+  }
 }
 
 //**********************************************************************************************//

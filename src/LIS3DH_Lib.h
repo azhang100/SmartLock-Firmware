@@ -19,8 +19,13 @@
 byte buffer[ 6 ]; 
 byte statusReg; 
 boolean ready = false ; 
-int outX, outY, outZ; 
-int xVal, yVal, zVal; 
+
+struct AccelData {
+    int outX, outY, outZ; 
+    int xVal, yVal, zVal; 
+};
+
+AccelData accelData;
 
 //**********************************************************************************************//
 //				   FUNCTIONS DECLARATIONS				 	//
@@ -69,7 +74,7 @@ int getData(){
   }
     
   if (bitRead(statusReg, 7 ) == 1 ){
-     Serial.println( " Some data have been overwritten. " ); 
+     debugSerial.println( " Some data have been overwritten. " ); 
   }
   // read the result 
   Wire.beginTransmission(ADDRESS_LIS3DH); 
@@ -82,23 +87,23 @@ int getData(){
     }
   }
   // calculation 
-  outX = (buffer[ 1 ] << 8 ) | buffer[ 0 ]; 
-  outY = (buffer[ 3 ] << 8 ) | buffer[ 2 ]; 
-  outZ = (buffer[ 5 ] << 8 ) | buffer[ 4 ]; 
-  xVal = outX / 16 ; 
-  yVal = outY / 16 ; 
-  zVal = outZ / 16 ; 
+  accelData.outX = (buffer[ 1 ] << 8 ) | buffer[ 0 ]; 
+  accelData.outY = (buffer[ 3 ] << 8 ) | buffer[ 2 ]; 
+  accelData.outZ = (buffer[ 5 ] << 8 ) | buffer[ 4 ]; 
+  accelData.xVal = accelData.outX / 16 ;
+  accelData.yVal = accelData.outY / 16 ;
+  accelData.zVal = accelData.outZ / 16 ;
   
   /*
   
-  Serial.print( " outX: " ); 
-  Serial.print(xVal); 
-  Serial.print( " " ); 
-  Serial.print( " outY: " ); 
-  Serial.print(yVal); 
-  Serial.print( " " );
-  Serial.print( " outZ: " ); 
-  Serial.println(zVal); 
+  debugSerial.print( " outX: " ); 
+  debugSerial.print(xVal); 
+  debugSerial.print( " " ); 
+  debugSerial.print( " outY: " ); 
+  debugSerial.print(yVal); 
+  debugSerial.print( " " );
+  debugSerial.print( " outZ: " ); 
+  debugSerial.println(zVal); 
   
   */
   
@@ -110,8 +115,8 @@ int getData(){
 int getAngle(){
   getData();
   int curAngle;
-  curAngle=(180*atan(((float)xVal)/yVal)/PI)+90;
-  if(yVal>0) curAngle=180+curAngle;
+  curAngle=(180*atan(((float)accelData.xVal)/accelData.yVal)/PI)+90;
+  if(accelData.yVal>0) curAngle=180+curAngle;
   
   return curAngle;
 }

@@ -24,6 +24,7 @@ the lock figures out the direction of lock/unlock.
 //**********************************************************************************************//
 
 void executeCommandFromUser(String inputString);
+void debugCommandFromUser(String inputString);
 
 //**********************************************************************************************//
 //					FUNCTIONS					 	//
@@ -47,8 +48,8 @@ String value = "";
         value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
         if (command.equals("Power")) { // set the power
             settings.power.setData(value.toInt());
-             Serial.println(command);
-             Serial.println(value);
+             debugSerial.println(command);
+             debugSerial.println(value);
             stringOK = true;
         }
       }
@@ -57,7 +58,7 @@ String value = "";
         int pos = inputString.indexOf(';');
         if (pos > -1) {
         command = inputString.substring(0, pos);
-        Serial.println(command);
+        debugSerial.println(command);
         
         if (command.equals("LockedAngle")) { // set the LockedAngle
           settings.lockedAngle.setData(getAngle());
@@ -77,9 +78,9 @@ String value = "";
     if (pos > -1) {
       command = inputString.substring(0, pos);
       value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
-       Serial.println(command);
-       Serial.println(value);
-      if (command.equals("LockCMD")) { // lock or unlock 
+       debugSerial.println(command);
+       debugSerial.println(value);
+      if (command.equals("Lock")) { // lock or unlock 
           value.equals("Lock") ? controlMotor('l') : controlMotor('u'); 
         stringOK = true;
       }
@@ -87,9 +88,9 @@ String value = "";
   }
   else if (inputString.startsWith("LOCKSTATUS")) {
       if(isLocked)
-        Serial.println("Locked");
+        debugSerial.println("Locked");
       else
-        Serial.println("Unlocked");  
+        debugSerial.println("Unlocked");  
       stringOK = true;
     }
   
@@ -97,4 +98,24 @@ String value = "";
   inputString = "";
   commandAvailable = false;
 } // stringComplete
+
+
+void debugCommandFromUser(String inputString){
+  if (inputString == "c"){controlMotor('l');}
+  else if (inputString == "o"){controlMotor('u');}
+  else if (inputString == "l"){
+    motorTime(settings.turnTestTime.getData()*10+300);
+    motorTime(-settings.turnTestTime.getData()*10);
+  }
+  else if (inputString == "r"){
+    motorTime(-settings.turnTestTime.getData()*10-300);
+    motorTime(settings.turnTestTime.getData()*10);
+  }
+  else if (inputString == "i"){
+    settings.turnTestTime.setData(settings.turnTestTime.getData()+10);
+  }
+  else if (inputString == "d"){
+    settings.turnTestTime.setData(settings.turnTestTime.getData()-10);
+  }
+}
 

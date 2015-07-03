@@ -22,8 +22,8 @@ class Attribute
   public:
     
     Attribute(){
-    address =0;
-    data=0;
+      address =0;
+      data=0;
     }
     
     byte getData(){return data;}
@@ -47,6 +47,7 @@ class Settings
     Attribute unlockedAngle;   
     Attribute lockedAngle;     
     Attribute power;            // ranges from 50 to 255
+    Attribute turnTestTime;
    
     Settings()
     {
@@ -54,12 +55,14 @@ class Settings
       unlockedAngle.setAddress(2);
       lockedAngle.setAddress(3);
       power.setAddress(4);
+      turnTestTime.setAddress(5);
       
       int set = EEPROM.read(MASTER_MEMORY_ADDRESS);
       if (set == DEFAULT_EEPROM_VAL){
           turnDirection.setData(1);
           unlockedAngle.setData(180);
           lockedAngle.setData(70);
+          turnTestTime.setData(200);
           power.setData(255);
           EEPROM.write(MASTER_MEMORY_ADDRESS, 1); // so next time it just reads the data
       }
@@ -68,6 +71,7 @@ class Settings
           unlockedAngle.readData();
           lockedAngle.readData();
           power.readData();
+          turnTestTime.readData();
       }
     }
 };

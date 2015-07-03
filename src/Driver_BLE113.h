@@ -16,7 +16,7 @@ Z...Z is the actual message, which is a series of bytes
 //**********************************************************************************************//
 
 #define		BAUD_RATE          38400
-#define         BLE_MODE_DELAY     1000
+#define         BLE_MODE_DELAY     200
 #define         BLE_INPUT_DELAY    1
 
 //**********************************************************************************************//
@@ -38,11 +38,16 @@ int sending_cmd[2]= { 0x11, 0x15};
 int store_data[20];
 
 //**********************************************************************************************//
-//				   FUNCTIONS DECLARATIONS				 	//
+//				   EXPOSED FUNCTIONS				 	//
 //**********************************************************************************************//
 
 void BLE_init();
-String readBLE();               // stores BLE text in inputstring
+String readBLE();               // returns text from BLE
+
+//**********************************************************************************************//
+//				   NON-EXPOSED DECLARATIONS				 	//
+//**********************************************************************************************//
+
 void sendCommand(int len, int command[]);
 String interpret();
 int getNextData();
@@ -57,11 +62,11 @@ void BLE_init()
   BLE.begin(BAUD_RATE);
   delay(BLE_MODE_DELAY);    //wait to reset the ble
   
-  Serial.println("Setup...");
+  debugSerial.println("Setup...");
   sendCommand(7,setup_cmd);
-  Serial.println("Bond...");
+  debugSerial.println("Bond...");
   sendCommand(6,bond_cmd);
-  Serial.println("Mitm...");
+  debugSerial.println("Mitm...");
   sendCommand(8,mitm_cmd);  
 }
 
@@ -71,7 +76,7 @@ String readBLE() {
     int i;
     int eventType = getNextData();
     
-    if (eventType == 128){ // data[0] means that it has an actual value
+    if (eventType == 128){ // data[0]==128 means that it has an actual value
       for (i=0; i<9; i++){getNextData();} // burn values data[1:10]
       int lengthOfMessage = getNextData();
       
@@ -80,17 +85,17 @@ String readBLE() {
         inChar = (char)getNextData(); 
         outputString += inChar;
       }
-    Serial.print("Got String: ");Serial.println(outputString);  
-    Serial.print("String Len: ");Serial.println(outputString.length());
+    debugSerial.print("Got String: ");debugSerial.println(outputString);  
+    debugSerial.print("String Len: ");debugSerial.println(outputString.length());
       //return outputString;
     }
     else {
-      Serial.println("Got Unknown Command");
+      debugSerial.println("Got Unknown Command");
       //return outputString;
     }
   }
   if(outputString.length() > 0)
-  {Serial.print("Got String: ");Serial.println(outputString);}
+  {debugSerial.print("Got String: ");debugSerial.println(outputString);}
   return outputString;
 }
 
@@ -122,6 +127,6 @@ String interpret(){
 
 int getNextData(){ // returns next byte in serial com
   int data = BLE.read();
-  Serial.print("Got Byte: ");Serial.println(data);
+  debugSerial.print("Got Byte: ");debugSerial.println(data);
   return data;
 }

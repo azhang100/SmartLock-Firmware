@@ -16,7 +16,7 @@
 //**********************************************************************************************//
 
 int sleepCount = 0;                   // counter
-int sleepCountMax = 10000;            // after this many counts it goes to sleep
+int sleepCountMax = 500;            // after this many counts it goes to sleep
 
 //**********************************************************************************************//
 //				   FUNCTIONS DECLARATIONS				 	//
@@ -27,6 +27,8 @@ void sleep_init();
 void resetSleepCounter();
 void sleep();               // sleeps the mpu
 void sleepNow();            // this function the actual sleeping part of sleep() BUT DO NOT CALL IT DIRECTLY
+void sleepStart();          // execute stuff right before you go to sleep
+void sleepEnd();            // turn stuff back on
 
 //**********************************************************************************************//
 //					FUNCTIONS					 	//
@@ -34,8 +36,7 @@ void sleepNow();            // this function the actual sleeping part of sleep()
 
 void wakeUpNow(){}       // simply calling this function will wake it up.
 
-void sleep_init()
-{
+void sleep_init(){
   pinMode(WAKE_ACCEL, INPUT);
   pinMode(WAKE_BLE, INPUT);
 }
@@ -44,16 +45,30 @@ void resetSleepCounter(){
   sleepCount = 0;
 }
 
+void sleepStart(){
+  digitalWrite(13, LOW);
+  digitalWrite(MOTOR_B_SLP, LOW);
+}
+
+void sleepEnd(){
+  digitalWrite(13,HIGH);
+  digitalWrite(MOTOR_B_SLP, HIGH);
+}
+
 void sleep(){
-      Serial.println("Entering Sleep mode");
+      debugSerial.println("Entering Sleep mode");
+      BLE.println("Entering Sleep mode");
       delay(100);     // this delay is needed, the sleep 
                       //function will provoke a Serial error otherwise!!
       resetSleepCounter();
       
+      sleepStart();
       sleepNow();
+      sleepEnd();
       
-      Serial.println("Waking up");
-}
+      debugSerial.println("Waking up");
+      BLE.println("Waking up");
+    }
 
 void sleepNow(){         // here we put the arduino to sleep DO NOT CALL THIS FUNCTION CALL SLEEP INSTEAD
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
