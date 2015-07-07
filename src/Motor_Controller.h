@@ -4,8 +4,7 @@
 //					DEFINES						 	//
 //**********************************************************************************************//
                                                       
-#define         MOTOR_ANGLE_BUFFER      9             // Inputs with absolute value below this number are ignored
-                                                      // the motor rotates 16 to 17 degrees additional angle after slow stopping.
+#define         MOTOR_ANGLE_BUFFER      10             // the motor rotates 16 to 17 degrees additional angle after slow stopping.
                                                         
 //**********************************************************************************************//
 //					GLOBAL VARIABLES				 	//
@@ -31,25 +30,25 @@ void controlMotor(char command){
   
   if (command=='u' && isLocked==true) 
   {  desiredAngle = settings.unlockedAngle.getData(); desiredDirection = settings.turnDirection.getData(); motorActive = true;
-      debugSerial.println("please unlock"); debugSerial.println(settings.unlockedAngle.getData());
+      Serial.println("please unlock"); Serial.println(settings.unlockedAngle.getData());
   }
   else if (command=='l' && isLocked==false)
   {
     desiredAngle = settings.lockedAngle.getData(); desiredDirection = -settings.turnDirection.getData(); motorActive = true;
-     debugSerial.println("please lock"); debugSerial.println(settings.lockedAngle.getData());
+     Serial.println("please lock"); Serial.println(settings.lockedAngle.getData());
   }  
   
   while(motorActive == true)
   {
     angleFromAccelerometer = getAngle();
-      debugSerial.println("current angle:");     debugSerial.println(angleFromAccelerometer);
-      debugSerial.println("desired angle:");     debugSerial.println(desiredAngle);
+      Serial.println("current angle:");     Serial.println(angleFromAccelerometer);
+      Serial.println("desired angle:");     Serial.println(desiredAngle);
         
     //Moves slightly closer to desiredAngle in desiredDirection
     if (abs(angleFromAccelerometer - desiredAngle) < MOTOR_ANGLE_BUFFER )
     {
       // reached position
-         debugSerial.println("yay reached my destination");
+         Serial.println("yay reached my destination");
       motorOut(0);
       motorActive = false;
        if (command=='u') 
@@ -63,7 +62,7 @@ void controlMotor(char command){
     }
     else
     {
-      debugSerial.println("keep driving");
+      // Serial.println("keep driving");
       motorOut(settings.power.getData()*desiredDirection);
     }
   }

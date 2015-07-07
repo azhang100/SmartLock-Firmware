@@ -15,9 +15,6 @@
 //					GLOBAL VARIABLES				 	//
 //**********************************************************************************************//
 
-int sleepCount = 0;                   // counter
-int sleepCountMax = 500;            // after this many counts it goes to sleep
-
 //**********************************************************************************************//
 //				   FUNCTIONS DECLARATIONS				 	//
 //**********************************************************************************************//
@@ -48,46 +45,49 @@ void resetSleepCounter(){
 void sleepStart(){
   digitalWrite(13, LOW);
   digitalWrite(MOTOR_B_SLP, LOW);
+  BLE.end();
+  Serial.end();
 }
 
 void sleepEnd(){
   digitalWrite(13,HIGH);
   digitalWrite(MOTOR_B_SLP, HIGH);
+  BLE.begin(BAUD_RATE);
+  Serial.begin(9600);
 }
 
 void sleep(){
-      debugSerial.println("Entering Sleep mode");
-      BLE.println("Entering Sleep mode");
-      delay(100);     // this delay is needed, the sleep 
-                      //function will provoke a Serial error otherwise!!
-      resetSleepCounter();
-      
-      sleepStart();
-      sleepNow();
-      sleepEnd();
-      
-      debugSerial.println("Waking up");
-      BLE.println("Waking up");
-    }
+  Serial.println("Entering Sleep mode");
+  BLE.println("Entering Sleep mode");
+  delay(100);     // this delay is needed, the sleep 
+                  //function will provoke a Serial error otherwise!!
+  resetSleepCounter();
+  
+  sleepStart();
+  sleepNow();
+  sleepEnd();
+  
+  Serial.println("Waking up");
+  BLE.println("Waking up");
+}
 
 void sleepNow(){         // here we put the arduino to sleep DO NOT CALL THIS FUNCTION CALL SLEEP INSTEAD
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
 
-    sleep_enable();          // enables the sleep bit in the mcucr register
-                             // so sleep is possible. just a safety pin 
+  sleep_enable();          // enables the sleep bit in the mcucr register
+                           // so sleep is possible. just a safety pin 
 
-    attachInterrupt(INT_ACCEL, wakeUpNow, CHANGE); // use interrupt 0 (pin 2) and run function
-                                       // wakeUpNow when pin 2 gets LOW 
-    attachInterrupt(INT_BLE, wakeUpNow, LOW); // use interrupt 1 (pin 3) and run function
-                                       // wakeUpNow when pin 3 gets LOW                                   
+  attachInterrupt(INT_ACCEL, wakeUpNow, CHANGE); // use interrupt 0 (pin 2) and run function
+                                     // wakeUpNow when pin 2 gets LOW 
+  attachInterrupt(INT_BLE, wakeUpNow, LOW); // use interrupt 1 (pin 3) and run function
+                                     // wakeUpNow when pin 3 gets LOW                                   
 
-    sleep_mode();            // here the device is actually put to sleep!!
-                             // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP
+  sleep_mode();            // here the device is actually put to sleep!!
+                           // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP
 
-    sleep_disable();         // first thing after waking from sleep:
-                             // disable sleep...
-    detachInterrupt(0);      // disables interrupt 0 on pin 2 so the 
-                             // wakeUpNow code will not be executed 
-                             // during normal running time.
-
+  sleep_disable();         // first thing after waking from sleep:
+                           // disable sleep...
+  detachInterrupt(0);      // disables interrupt 0 on pin 2 so the 
+                           // wakeUpNow code will not be executed 
+                           // during normal running time.
 }

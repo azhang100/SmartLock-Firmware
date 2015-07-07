@@ -62,11 +62,11 @@ void BLE_init()
   BLE.begin(BAUD_RATE);
   delay(BLE_MODE_DELAY);    //wait to reset the ble
   
-  debugSerial.println("Setup...");
+  Serial.println("Setup...");
   sendCommand(7,setup_cmd);
-  debugSerial.println("Bond...");
+  Serial.println("Bond...");
   sendCommand(6,bond_cmd);
-  debugSerial.println("Mitm...");
+  Serial.println("Mitm...");
   sendCommand(8,mitm_cmd);  
 }
 
@@ -85,17 +85,17 @@ String readBLE() {
         inChar = (char)getNextData(); 
         outputString += inChar;
       }
-    debugSerial.print("Got String: ");debugSerial.println(outputString);  
-    debugSerial.print("String Len: ");debugSerial.println(outputString.length());
+    Serial.print("Got String: ");Serial.println(outputString);  
+    Serial.print("String Len: ");Serial.println(outputString.length());
       //return outputString;
     }
     else {
-      debugSerial.println("Got Unknown Command");
+      Serial.println("Got Unknown Command");
       //return outputString;
     }
   }
   if(outputString.length() > 0)
-  {debugSerial.print("Got String: ");debugSerial.println(outputString);}
+  {Serial.print("Got String: ");Serial.println(outputString);}
   return outputString;
 }
 
@@ -127,6 +127,6 @@ String interpret(){
 
 int getNextData(){ // returns next byte in serial com
   int data = BLE.read();
-  debugSerial.print("Got Byte: ");debugSerial.println(data);
+  Serial.print("Got Byte: ");Serial.println(data);
   return data;
 }

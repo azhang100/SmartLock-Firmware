@@ -30,10 +30,17 @@ void BLE_init()
 
 String readBLE(){
   String outputString = "";
-  while (BLE.available()) {
-      debugSerial.println("BLE");
-    char inChar = (char)BLE.read();
-    outputString += inChar;
+  if (BLE.available()){
+    while (BLE.available()) {
+      char inChar = (char)BLE.read();
+      outputString += inChar;
+    }
+  }
+  else if (Serial.available()){
+    while (Serial.available()) {
+      char inChar = (char)Serial.read();
+      outputString += inChar;
+    }
   }
   
   if(outputString.length() > 0)

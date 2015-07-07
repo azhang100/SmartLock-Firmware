@@ -48,8 +48,8 @@ String value = "";
         value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
         if (command.equals("Power")) { // set the power
             settings.power.setData(value.toInt());
-             debugSerial.println(command);
-             debugSerial.println(value);
+             Serial.println(command);
+             Serial.println(value);
             stringOK = true;
         }
       }
@@ -58,7 +58,7 @@ String value = "";
         int pos = inputString.indexOf(';');
         if (pos > -1) {
         command = inputString.substring(0, pos);
-        debugSerial.println(command);
+        Serial.println(command);
         
         if (command.equals("LockedAngle")) { // set the LockedAngle
           settings.lockedAngle.setData(getAngle());
@@ -78,8 +78,8 @@ String value = "";
     if (pos > -1) {
       command = inputString.substring(0, pos);
       value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
-       debugSerial.println(command);
-       debugSerial.println(value);
+       Serial.println(command);
+       Serial.println(value);
       if (command.equals("Lock")) { // lock or unlock 
           value.equals("Lock") ? controlMotor('l') : controlMotor('u'); 
         stringOK = true;
@@ -88,9 +88,9 @@ String value = "";
   }
   else if (inputString.startsWith("LOCKSTATUS")) {
       if(isLocked)
-        debugSerial.println("Locked");
+        Serial.println("Locked");
       else
-        debugSerial.println("Unlocked");  
+        Serial.println("Unlocked");  
       stringOK = true;
     }
   

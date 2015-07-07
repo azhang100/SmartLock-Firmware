@@ -1,15 +1,24 @@
-#include "arduino.h"
-
 #include <Wire.h>
+#include <SoftwareSerial.h>
 #include "LIS3DH_Lib.h"
+
+float curAngle=0;
+float prevAngle=0;
+float coVar=1;
 
 void setup(){
   Serial.begin(9600);
-  Serial.println("Serial active");
   accel_init();
-  Serial.println("setup done");
 }
 
+
 void loop(){
-  Serial.println(getAngle());
+  
+  curAngle=getAngle();
+  curAngle=filterData(&curAngle,&prevAngle,&coVar);
+  Serial.println(curAngle);
+  
+  //Serial.println(getAngle());
+  //getAngle();
+  delay(10);
 }

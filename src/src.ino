@@ -2,6 +2,21 @@
 //					DEFINES						 	//
 //**********************************************************************************************//
 
+#define           LOOP_TIME              10 // in milliseconds
+#define           UPDATE_TIME            500 // in milliseconds
+#define           SLEEP_TIME             10000 // in milliseconds
+
+//**********************************************************************************************//
+//					GLOBAL VARIABLES				 	//
+//*****************************************************    *****************************************//
+
+int statusLED = true;
+int loopCount=0; // to slow down blinking
+
+int loopsToUpdate = UPDATE_TIME/LOOP_TIME;
+int sleepCount = 0;                   // counter
+int loopsToSleep = SLEEP_TIME/LOOP_TIME;
+
 //**********************************************************************************************//
 //					IMPORTS						 	//
 //**********************************************************************************************//
@@ -11,7 +26,7 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
-SoftwareSerial debugSerial(0,1);
+// SoftwareSerial debugSerial(0,1);
 
 // ============Memory============
 #include <EEPROM.h>
@@ -36,13 +51,6 @@ SoftwareSerial debugSerial(0,1);
 #include "Command.h"
 
 //**********************************************************************************************//
-//					GLOBAL VARIABLES				 	//
-//*****************************************************    *****************************************//
-
-int statusLED = true;
-int loopCount=0; // to slow down blinking
-
-//**********************************************************************************************//
 //				   FUNCTIONS DECLARATIONS				 	//
 //**********************************************************************************************//
 
@@ -56,54 +64,58 @@ void loop();
 //The arduino runs the setup function first
 void setup() 
 {
-  debugSerial.begin(9600);
-  debugSerial.println("start of setup");
+  Serial.begin(9600);
+  Serial.println("start of setup");
   
   pinMode(13,OUTPUT);
   pinMode(12,OUTPUT);
   pinMode(11,OUTPUT);
   
-  debugSerial.println("init accel...");
+  Serial.println("init accel...");
   accel_init(); // should be done as early as possible to give it as much time to calibrate
-  debugSerial.println("done");
+  Serial.println("done");
   
-  debugSerial.println("init ble...");
+  Serial.println("init ble...");
   BLE_init();
-  debugSerial.println("done");
+  Serial.println("done");
   
-  debugSerial.println("init motor...");
+  Serial.println("init motor...");
   motor_init();
-  debugSerial.println("done");
+  Serial.println("done");
   
-  debugSerial.println("setup done");
+  Serial.println("setup done");
 }
 
 
 void loop()
 {
-  delay(1);
+  // UPDATE
+  delay(LOOP_TIME);
   loopCount++;
+  sleepCount++;
+  int angle = getAngle();
+  update_motor();
   
-  if (loopCount == 200){
-    sleepCount++;
+  if (loopCount == loopsToUpdate){
     loopCount = 0;
     statusLED = !statusLED;
     digitalWrite(13,statusLED);
-    debugSerial.print("Current Orientation: ");debugSerial.println(getAngle());
-    debugSerial.print("Awake for: "); debugSerial.print(sleepCount); debugSerial.println(" loops");
+    Serial.print("Current Orientation: "); Serial.println(angle);
+    //Serial.print("Awake for: "); Serial.print(sleepCount); Serial.println(" loops");
   }
+
+  if (sleepCount >= loopsToSleep){sleep();}
+
+  // CONTROL
   
   String command; // read commands sent by user
   command=readBLE();
   recievedCommand(command);
-  
-  if (sleepCount >= sleepCountMax){sleep();}
-  
 }
 
 void recievedCommand(String command){
   if (command.length() > 0){
-    debugSerial.print("Got Command: ");debugSerial.println(command);
+    Serial.print("Got Command: ");Serial.println(command);
     // execute the user commands
     executeCommandFromUser(command);
     debugCommandFromUser(command);
