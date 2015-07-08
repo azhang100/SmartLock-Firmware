@@ -30,75 +30,43 @@ void debugCommandFromUser(String inputString);
 //					FUNCTIONS					 	//
 //**********************************************************************************************//
 
+void executeCommandFromUser(String inputString){
+  int ID = inputString[0];
+  Serial.print("ID     : ");Serial.println(ID);
+  if (hasPermissions(ID) == 0){return;}
 
-void executeCommandFromUser(String inputString)
-{
-String command = "";
-String value = "";
+  String command = inputString.substring(1,4);
+  String input = inputString.substring(4,inputString.length());
 
-  boolean stringOK = false;
-  if (inputString.startsWith("CFG ")) 
-  {
-    inputString = inputString.substring(4);
+  Serial.print("Command: ");Serial.println(command);
+  Serial.print("Input  : ");Serial.println(input);
 
-    int pos = inputString.indexOf('=');
-      if (pos > -1) 
-      {
-        command = inputString.substring(0, pos);
-        value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
-        if (command.equals("Power")) { // set the power
-            settings.power.setData(value.toInt());
-             Serial.println(command);
-             Serial.println(value);
-            stringOK = true;
-        }
-      }
-      else
-      { 
-        int pos = inputString.indexOf(';');
-        if (pos > -1) {
-        command = inputString.substring(0, pos);
-        Serial.println(command);
-        
-        if (command.equals("LockedAngle")) { // set the LockedAngle
-          settings.lockedAngle.setData(getAngle());
-          stringOK = true;
-        }
-        else if (command.equals("UnlockedAngle")) { // set the UnlockedAngle
-          settings.unlockedAngle.setData(getAngle());
-          stringOK = true;
-        }
-        
-      }
-    }
+  if (command == "CFG"){
+    String settingString = input.substring(0,3);
+    String value = input.substring(3, inputString.length());
+
+    Attribute setting;
+    
+    if (settingString == "PWR"){setting = settings.power;}
+    else if (settingString == "LKA"){setting = settings.lockedAngle;}
+    else if (settingString == "ULA"){setting = settings.unlockedAngle;}
+    else if (settingString == "PAS"){setting = settings.lockPass;}
+
+    setting.setData(value.toInt());
+    Serial.print("Set ");Serial.print(settingString);Serial.print(" to ");Serial.println(value.toInt());
   }
-  else if (inputString.startsWith("CMD ")) {
-    inputString = inputString.substring(4);
-    int pos = inputString.indexOf('=');
-    if (pos > -1) {
-      command = inputString.substring(0, pos);
-      value = inputString.substring(pos+1, inputString.length()-1);  // extract command up to ; excluded
-       Serial.println(command);
-       Serial.println(value);
-      if (command.equals("Lock")) { // lock or unlock 
-          value.equals("Lock") ? controlMotor('l') : controlMotor('u'); 
-        stringOK = true;
-      }
-  }
-  }
-  else if (inputString.startsWith("LOCKSTATUS")) {
-      if(isLocked)
-        Serial.println("Locked");
-      else
-        Serial.println("Unlocked");  
-      stringOK = true;
-    }
   
-  // clear the string for next iteration
-  inputString = "";
-  commandAvailable = false;
+  else if (command == "CMD"){
+    input.equals("Lock") ? controlMotor('l') : controlMotor('u'); 
+  }
+  else if (command == "STS"){
+    
+    if(isLocked)
+      Serial.println("Locked");
+    else
+      Serial.println("Unlocked");  
+  }
 } // stringComplete
-
 
 void debugCommandFromUser(String inputString){
   if (inputString == "c"){controlMotor('l');}

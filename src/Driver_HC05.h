@@ -36,15 +36,7 @@ String readBLE(){
       outputString += inChar;
     }
   }
-  else if (Serial.available()){
-    while (Serial.available()) {
-      char inChar = (char)Serial.read();
-      outputString += inChar;
-    }
-  }
-  
   if(outputString.length() > 0)
   {BLE.print("Got String: "); BLE.println(outputString);}
-  
   return outputString;
 }

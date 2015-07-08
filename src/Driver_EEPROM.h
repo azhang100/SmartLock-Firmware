@@ -20,7 +20,9 @@ class Attribute
   byte data;
   
   public:
-    
+
+    String ID;
+  
     Attribute(){
       address =0;
       data=0;
@@ -38,6 +40,7 @@ class Attribute
     void setAddress(byte addressIn){
       address = addressIn;
     }
+    
 };
 
 class Settings
@@ -48,6 +51,7 @@ class Settings
     Attribute lockedAngle;     
     Attribute power;            // ranges from 50 to 255
     Attribute turnTestTime;
+    Attribute lockPass;
    
     Settings()
     {
@@ -56,6 +60,7 @@ class Settings
       lockedAngle.setAddress(3);
       power.setAddress(4);
       turnTestTime.setAddress(5);
+      lockPass.setAddress(6);
       
       int set = EEPROM.read(MASTER_MEMORY_ADDRESS);
       if (set == DEFAULT_EEPROM_VAL){
@@ -64,6 +69,7 @@ class Settings
           lockedAngle.setData(70);
           turnTestTime.setData(200);
           power.setData(255);
+          lockPass.setData(97); // 97 is ascii value for "a"
           EEPROM.write(MASTER_MEMORY_ADDRESS, 1); // so next time it just reads the data
       }
       else { // (set =! DEFAULT_EEPROM_VAL)
@@ -72,8 +78,10 @@ class Settings
           lockedAngle.readData();
           power.readData();
           turnTestTime.readData();
+          lockPass.readData();
       }
     }
+    
 };
 
 //**********************************************************************************************//

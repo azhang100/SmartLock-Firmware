@@ -26,7 +26,8 @@ int loopsToSleep = SLEEP_TIME/LOOP_TIME;
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
-// SoftwareSerial debugSerial(0,1);
+// ============Debug==========
+#include "debug.h"
 
 // ============Memory============
 #include <EEPROM.h>
@@ -47,7 +48,10 @@ int loopsToSleep = SLEEP_TIME/LOOP_TIME;
 #include <avr/sleep.h>
 #include "Driver_Sleep.h"
 
-// ============Execute USer Commands============
+// ============Security============
+#include "Security.h"
+
+// ============Execute User Commands============
 #include "Command.h"
 
 //**********************************************************************************************//
@@ -64,12 +68,12 @@ void loop();
 //The arduino runs the setup function first
 void setup() 
 {
-  Serial.begin(9600);
-  Serial.println("start of setup");
   
   pinMode(13,OUTPUT);
   pinMode(12,OUTPUT);
   pinMode(11,OUTPUT);
+
+  debug_init();
   
   Serial.println("init accel...");
   accel_init(); // should be done as early as possible to give it as much time to calibrate
@@ -94,14 +98,14 @@ void loop()
   loopCount++;
   sleepCount++;
   int angle = getAngle();
-  update_motor();
+  //update_motor();
   
   if (loopCount == loopsToUpdate){
     loopCount = 0;
     statusLED = !statusLED;
     digitalWrite(13,statusLED);
-    Serial.print("Current Orientation: "); Serial.println(angle);
-    //Serial.print("Awake for: "); Serial.print(sleepCount); Serial.println(" loops");
+    // Serial.print("Current Orientation: "); Serial.println(angle);
+    // Serial.print("Awake for: "); Serial.print(sleepCount); Serial.println(" loops");
   }
 
   if (sleepCount >= loopsToSleep){sleep();}
@@ -110,6 +114,8 @@ void loop()
   
   String command; // read commands sent by user
   command=readBLE();
+  recievedCommand(command);
+  command=readSerial();
   recievedCommand(command);
 }
 
