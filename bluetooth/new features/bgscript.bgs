@@ -1,0 +1,198 @@
+dim adv_data(13)    # custom advertisement data
+dim sr_data(20)     # custom scan response data (friendly name for active scanning)
+dim mac_addr(6)     # Bluetooth MAC address container
+
+dim battery_remaining
+
+dim tx_power_level
+
+dim first_name(20)
+dim last_name(20)
+dim email_address(20)
+
+dim open_or_close
+dim is_locked
+dim key_phone_or_website
+dim time_accessed(20)
+dim lock_notification
+
+dim aesIn(16)
+dim aesOut(16)
+dim aesKey(16)
+dim enc_data(16)
+dim res_len
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# NOTE: the data you put in either the main advertisement packet or the scan
+# response packet cannot exceed 31 bytes in length. This is a BLE protocol
+# limitation. Any data that is longer than this will be truncated.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+event system_boot(major, minor, patch, build, ll_version, protocol, hw)
+
+	#call sm_passkey_entry(1)
+
+
+	call sm_set_bondable_mode(1)
+	call sm_set_parameters(1, 16, sm_io_capability_displayonly)
+	#call sm_set_oob_data(16, "0123456789ABCEDF")
+	call sm_encrypt_start(0, 1)
+	
+	
+
+
+    # write custom device name to local GATT attribute
+    call attributes_write(c_device_name, 0, 18, "My SimSim")
+	
+	
+	
+	
+	aesIn(0:16) = "hellohellohelloh"
+	call attributes_write(c_aes_in, 0, 16, aesIn(0:16))
+	
+	#aesKey(0:16) = "ug7c7FtuEB6TUzWj"
+	#call attributes_write(c_aes_key, 0, 16, aesKey(0:16))
+	#call system_aes_setkey(16, aesKey(0:16))
+	
+	call system_aes_encrypt(16, aesIn(0:16))(res_len, enc_data(0:16))
+	call attributes_write(c_enc_data, 0, 16, enc_data(0:16))
+	
+	call system_aes_decrypt(res_len, enc_data(0:16))(res_len, aesOut(0:16))
+	call attributes_write(c_aes_out, 0, 16, aesOut(0:16))
+    
+	
+	
+	
+	
+    # flags for discoverable/connectable
+    adv_data(0:1) = $02 # ad field length = 2 bytes
+    adv_data(1:1) = gap_ad_type_flags   # ad field type = 0x01 (Flags)
+    adv_data(2:1) = $06 # flags = 0x06, connectable/undirected
+
+	
+	
+	
+    # tx power field advertisement, iOS apps may need this
+    #adv_data(3:1) = $02 # ad field length = 2 bytes
+    #adv_data(4:1) = gap_ad_type_txpower    # ad field type = 0x0A (TX Power)
+    #adv_data(5:1) = $03 # TX power in dBm
+	
+	call attributes_write(c_tx_power_level, 0, 1, $03)
+		
+    # NOTE: TX power is a signed 8-bit value, and is not changed automatically
+    # when using "hardware_set_txpower(<power>)". This may be anywhere from -23
+    # to +3 based on your settings. Negative values may be converted to two's
+    # complement form by adding 256, so for example -23 dBm would be 233 or $E9.
+    
+	
+	
+	
+    # custom manufacturer
+    #adv_data(6:1) = $06 # ad field length = 5 bytes (arbitrary, maybe more or less but minimum 3)
+    #adv_data(7:1) = $ff # ad field type = 0xFF (Manufacturer Specific Data)
+    #adv_data(8:1) = $00 # unknown/prototype Company Identifier Code - octet 2 
+    #adv_data(9:1) = $01 # unknown/prototype Company Identifier Code - octet 1 
+    #adv_data(10:1) = $b1 # custom data byte #1 (can be anything)
+    #adv_data(11:1) = $b2 # custom data byte #2 (can be anything)
+    #adv_data(12:1) = $b3 # custom data byte #3 (can be anything)
+
+
+	
+	
+	call attributes_write(c_first_name, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
+	call attributes_write(c_last_name, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
+	call attributes_write(c_email_address, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
+	
+	call attributes_write(c_open_or_close, 0, 1, open_or_close)
+	call attributes_write(c_is_locked, 0, 1, is_locked)
+	call attributes_write(c_key_phone_or_website, 0, 1, key_phone_or_website)
+	call attributes_write(c_time_accessed, 0, 20, time_accessed(0:20))
+	call attributes_write(c_lock_notification, 0, 1, lock_notification)
+	
+
+	
+	
+	
+    # set advertisement interval to 1s-2s, use all advertisement channels
+    # (note min/max parameters are in units of 625 uSec)
+    call gap_set_adv_parameters(1600, 3200, 7)
+    
+    # set custom advertisement data
+    call gap_set_adv_data(0, 13, adv_data(0:13))
+    
+    # set custom scan response data (i.e. the Device Name value)
+    call gap_set_adv_data(1, 20, sr_data(0:20))
+
+    # put module into discoverable/connectable mode (with user-defined advertisement data)
+    call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
+	
+	#call hardware_set_soft_timer(1920000, 0, 0)
+end
+
+
+
+
+#Battery Stuff
+# ADC behavior:
+# - Range is [-2048, +2047] when 12 ENOB is selected
+# - Value will be left-aligned in a 16-bit container, meaning the direct
+#       result will be in the range [-32768, +32767] and must be shifted
+# - Actual battery readings will only ever be positive, so we only care
+#       about the positive part of the range [0, +32767] or 0x0000-0x7FFF
+# - VDD voltage = (value >> 4) * 3 * 1.24 / 2048
+
+# Since no "float" data type exists in BGScript, we must convert the 
+# measurement manually, losing only as much precision as we have to in
+# the process.
+        
+# *** IMPORTANT***
+# A new CR2032 battery reads at ~2.52v based on some tests, but different
+# batteries may exhibit different levels here depending on chemistry.
+# You should test the range with your own battery to make sure).
+        
+# To scale the read value [0, +32767] to the range [0, 100] properly
+# we have to determine the 0% reading and the 100% reading based on
+# operating voltages.
+#
+# - A "full" battery will read ~2.65v:
+#   --> (2.65v/3) * (32767/1.24v) = 23342
+# - An "empty" battery will read ~2.0v (min module voltage):
+#   --> (2.0v/3) * (32767/1.24v) = 17616
+        
+# This means we must scale [+17616, +23342] to [0, +100]
+
+event attributes_user_read_request(connection, handle, offset, maxsize)
+    if handle = c_battery_remaining then
+        call hardware_adc_read(15, 3, 0)
+    end if
+end
+
+event hardware_adc_result(input, value)
+    # check for internal AVDD/3 result (battery channel)
+    if input = 15 then
+        battery_remaining = (value - 17616) * 100 / (23342 - 17616)
+
+        if battery_remaining > 100 then
+            battery_remaining = 100
+        end if
+        if battery_remaining < 0 then
+            battery_remaining = 0
+        end if
+		
+        call attributes_user_read_response(0, 0, 1, battery_remaining)
+    end if
+end
+#Battery Stuff
+
+#event hardware_soft_timer(handle)
+  # switch off advertising
+#	call gap_set_mode(0, 0)	
+#end
+
+event connection_disconnected(handle, result)
+    # disconnected!
+    
+    # return to discoverable/connectable mode (with user-defined advertisement data)
+    call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
+	
+end

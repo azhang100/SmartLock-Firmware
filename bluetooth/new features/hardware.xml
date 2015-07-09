@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<hardware>
+    <sleeposc enable="true" ppm="30" />
+    <usb enable="false" />
+	<script enable="true" />
+    <txpower power="15" bias="5" />
+    <slow_clock enable="true" />
+    <pmux regulator_pin="7" />
+</hardware>
