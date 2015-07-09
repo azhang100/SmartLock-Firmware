@@ -38,15 +38,14 @@ int loopsToSleep = SLEEP_TIME/LOOP_TIME;
 # include "Driver_HC05.h"
 
 // =============Accelerometer============
-//#include "MPU6050_Lib.h"
-#include "LIS3DH_Lib.h"
+#include "Accel.h"
 
 // ============Motor============
 #include "Motor_Controller.h"
 
 // ============Sleep============
 #include <avr/sleep.h>
-#include "Driver_Sleep.h"
+#include "Sleep.h"
 
 // ============Security============
 #include "Security.h"

@@ -1,5 +1,5 @@
 #ifndef _MPU6050_SIMPLELIB_H
-#define _MPU6050_SIMPLELIB_H
+#define _MPU6050_SIMPLELIB_H6050.
 
 //*******************************************************************************************//
 //                   			 DEFINES         		                     //
