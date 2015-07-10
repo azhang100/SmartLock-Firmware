@@ -125,28 +125,28 @@
 
 	
 	<!-- custom service for lock -->
-    <service uuid="A7479781-E985-40D6-8E9B-32AF2F144C52" id="lock_service" advertise="true">
+    <service uuid="FACE" id="lock_service" advertise="true">
         <description>AES SERVICE</description>
 		
-        <characteristic uuid="1CC734DF-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_key">
+        <characteristic uuid="1CC734D0-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_key">
             <description>AES KEY</description>
             <properties indicate="true" />
             <value type="hex" length="16" />
         </characteristic>
         
-        <characteristic uuid="C778D8DD-1877-4941-AAA4-537A8D390813" id="c_aes_in">
+        <characteristic uuid="1CC734D1-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_in">
             <description>AES DATA IN</description>
             <properties read="true" write="true" indicate="true" />
             <value variable_length="true" type="hex" length="16" />
         </characteristic>
 		
-		<characteristic uuid="B778D8DD-1877-4941-AAA4-537A8D390813" id="c_enc_data">
+		<characteristic uuid="1CC734D2-9F0E-41C2-91B3-C1B4A9EFB487" id="c_enc_data">
             <description>ENCRYPTED DATA</description>
             <properties read="true" indicate="true" />
             <value variable_length="true" type="hex" length="16" />
         </characteristic>
         
-        <characteristic uuid="A70B1D47-9D76-450F-85E8-B22D1C0CF986" id="c_aes_out">
+        <characteristic uuid="1CC734D3-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_out">
             <description>AES DATA OUT</description>
             <properties read="true" indicate="true" />
             <value variable_length="true" type="hex" length="16" />
@@ -155,34 +155,34 @@
 	</service>
 	
 	<!-- custom service for lock -->
-    <service uuid="37479781-E985-40D6-8E9B-32AF2F144C52" id="lock_service" advertise="true">
+    <service uuid="FADE" id="lock_service" advertise="true">
         <description>Lock Service</description>
 		
-        <characteristic uuid="2CC734DF-9F0E-41C2-91B3-C1B4A9EFB487" id="c_open_or_close">
+        <characteristic uuid="2CC734D0-9F0E-41C2-91B3-C1B4A9EFB487" id="c_open_or_close">
             <description>Open Or Close</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
         </characteristic>
         
-        <characteristic uuid="A778D8DD-1877-4941-AAA4-537A8D390813" id="c_is_locked">
+        <characteristic uuid="2CC734D1-9F0E-41C2-91B3-C1B4A9EFB487" id="c_is_locked">
             <description>Is Locked</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
         </characteristic>
         
-        <characteristic uuid="C70B1D47-9D76-450F-85E8-B22D1C0CF986" id="c_key_phone_or_website">
+        <characteristic uuid="2CC734D2-9F0E-41C2-91B3-C1B4A9EFB487" id="c_key_phone_or_website">
             <description>Key, Phone, Or Website</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
         </characteristic>
         
-        <characteristic uuid="85940381-5136-497F-8FBB-9A2C39632A3A" id="c_time_accessed">
+        <characteristic uuid="2CC734D3-9F0E-41C2-91B3-C1B4A9EFB487" id="c_time_accessed">
             <description>Time Accessed</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="20" />
         </characteristic>
         
-        <characteristic uuid="F1C47B6B-D9F8-46EA-B20F-CC2090D0CADC" id="c_lock_notification">
+        <characteristic uuid="2CC734D4-9F0E-41C2-91B3-C1B4A9EFB487" id="c_lock_notification">
             <description>Lock Notification</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
@@ -191,28 +191,28 @@
     </service>
     
 	<!-- custom service for data transmission test -->
-    <service uuid="195AE58A-437A-489B-B0CD-B7C9C394BAE4" id="read_write_service" advertise="true">
+    <service uuid="CAFE" id="read_write_service" advertise="true">
         <description>Read/Write Service</description>
 
-        <characteristic uuid="5FC569A0-74A9-4FA4-B8B7-8354C86E45A4" id="c_tx">
+        <characteristic uuid="195AE580-437A-489B-B0CD-B7C9C394BAE4" id="c_tx">
             <description>TX</description>
             <properties read="true" write="true" indicate="true"/>
             <value variable_length="true" length="20" />
         </characteristic>
 
-        <characteristic uuid="21819AB0-C937-4188-B0DB-B9621E1696CD" id="c_rx">
+        <characteristic uuid="195AE581-437A-489B-B0CD-B7C9C394BAE4" id="c_rx">
             <description>RX</description>
             <properties read="true" write="true" indicate="true"/>
             <value variable_length="true" length="20" />
         </characteristic>
 
-        <characteristic uuid="3C79909B-CC1C-4BB9-8595-F99FA98C6503" id="c_data3">
+        <characteristic uuid="195AE582-437A-489B-B0CD-B7C9C394BAE4" id="c_data3">
             <description>Data 3</description>
             <properties read="true" write="true" indicate="true" authenticated_read="true" authenticated_write="true"/>
             <value variable_length="true" length="20" />
         </characteristic>
 
-        <characteristic uuid="688BF288-0489-41CF-B6C1-D95209082D2E" id="c_unack">
+        <characteristic uuid="195AE583-437A-489B-B0CD-B7C9C394BAE4" id="c_unack">
             <description>Unacknowledged Data</description>
             <properties read="true" write_no_response="true" notify="true" authenticated_read="true" authenticated_write="true"/>
             <value variable_length="true" length="20" />
