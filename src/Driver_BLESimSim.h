@@ -3,24 +3,24 @@
 messages that might come from BLE113
 
 response when setting mode: 0 2 6 1 12 2 0 0 5 1 0 0 5 3
-when recieved message over ble: 128 A 2 0 0 0 B 0 0 0 Y Z....Z
 
-where A and B vary depending on how the message is received
-Y is the length of Z...Z
-Z...Z is the actual message, which is a series of bytes
+eg. "occ"
+111
+99
+99
 
 */
 
 //**********************************************************************************************//
-//					DEFINES						 	//
+//          DEFINES             //
 //**********************************************************************************************//
 
-#define		BAUD_RATE          38400
-#define         BLE_MODE_DELAY     500
+#define   BAUD_RATE          38400
+#define         BLE_MODE_DELAY     200
 #define         BLE_INPUT_DELAY    1
 
 //**********************************************************************************************//
-//					GLOBAL VARIABLES				 	//
+//          GLOBAL VARIABLES          //
 //**********************************************************************************************//
 
 SoftwareSerial BLE(3, 4); // RX, TX
@@ -38,22 +38,21 @@ int sending_cmd[2]={0x11, 0x15};
 int store_data[20];
 
 //**********************************************************************************************//
-//				   EXPOSED FUNCTIONS				 	//
+//           EXPOSED FUNCTIONS          //
 //**********************************************************************************************//
 
 void BLE_init();
 String readBLE();               // returns text from BLE
 
 //**********************************************************************************************//
-//				   NON-EXPOSED DECLARATIONS				 	//
+//           NON-EXPOSED DECLARATIONS         //
 //**********************************************************************************************//
 
 void sendCommand(int len, int command[]);
-String interpret();
 int getNextData();
 
 //**********************************************************************************************//
-//					FUNCTIONS					 	//
+//          FUNCTIONS           //
 //**********************************************************************************************//
 
 void BLE_init()
@@ -72,30 +71,12 @@ void BLE_init()
 
 String readBLE() {
   String outputString = "";
-  if (BLE.available()){
-    int i;
-    int eventType = getNextData();
-    
-    if (eventType == 128){ // data[0]==128 means that it has an actual value
-      for (i=0; i<9; i++){getNextData();} // burn values data[1:10]
-      int lengthOfMessage = getNextData();
-      
-      char inChar;
-      for (i=0; i<lengthOfMessage; i++){
-        inChar = (char)getNextData(); 
-        outputString += inChar;
-      }
-    Serial.print("Got String: ");Serial.println(outputString);  
-    Serial.print("String Len: ");Serial.println(outputString.length());
-      //return outputString;
-    }
-    else {
-      Serial.println("Got Unknown Command");
-      //return outputString;
-    }
+  while (BLE.available()){
+    outputString += (char)getNextData();
   }
-  if(outputString.length() > 0)
-  {Serial.print("Got String: ");Serial.println(outputString);}
+  if(outputString.length() > 0){
+    Serial.print("Got String: ");Serial.println(outputString);
+  }
   return outputString;
 }
 
@@ -106,23 +87,6 @@ void sendCommand(int len, int command[]){
     delay(BLE_INPUT_DELAY);
   }
   delay(BLE_MODE_DELAY);
-}
-
-String interpret(){
-  int i;
-  String inputString = "";
-  int eventType = BLE.read();
-  if (eventType == 128){ // data[0] means that it has an actual value
-    for (i=0; i<9; i++){getNextData();} // burn values data[1:10]
-    int lengthOfMessage = getNextData();
-    
-    char inChar;
-    for (i=0; i<lengthOfMessage; i++){
-      inChar = (char)getNextData(); 
-      inputString += inChar;
-    }
-  }
-  return inputString;
 }
 
 int getNextData(){ // returns next byte in serial com

@@ -33,7 +33,7 @@ void motor_init()
   pinMode( MOTOR_B_SLP, OUTPUT );
   digitalWrite( MOTOR_B_DIR, LOW );
   digitalWrite( MOTOR_B_PWM, LOW );
-  digitalWrite( MOTOR_B_SLP, HIGH);
+  digitalWrite( MOTOR_B_SLP, HIGH );
 }
 
 // actual motor driver function
@@ -48,20 +48,4 @@ void motorOut(int rotationalVelocity){
   
   else
   {analogWrite(MOTOR_B_PWM, 0);analogWrite(MOTOR_B_DIR, 0);Serial.println("stop");}
-}
-
-void motorTime(int time){
-  if (time == 0) {
-    motorOut(0);
-  }
-  else if (time > 0) {
-    motorOut(255);
-    delay(time);
-    motorOut(0);
-  }
-  else if (time < 0) {
-    motorOut(-255);
-    delay(-time);
-    motorOut(0);
-  }
 }

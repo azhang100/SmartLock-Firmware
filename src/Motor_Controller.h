@@ -67,3 +67,19 @@ void controlMotor(char command){
     }
   }
 }
+
+void motorTime(int time){
+  if (time == 0) {
+    motorOut(0);
+  }
+  else if (time > 0) {
+    motorOut(255);
+    delay(time);
+    motorOut(0);
+  }
+  else if (time < 0) {
+    motorOut(-255);
+    delay(-time);
+    motorOut(0);
+  }
+}

@@ -34,8 +34,9 @@ int loopsToSleep = SLEEP_TIME/LOOP_TIME;
 #include "Driver_EEPROM.h"
 
 // =============BT===========
-//#include "Driver_BLE113.h"
-# include "Driver_HC05.h"
+#include "Driver_BLE113.h"
+//#include "Driver_HC05.h"
+//#include "Driver_BLESimSim.h"
 
 // =============Accelerometer============
 #include "Accel.h"
@@ -84,6 +85,9 @@ void setup()
   
   Serial.println("init motor...");
   motor_init();
+  Serial.println("motor hard test");
+  motorTime(500);
+  motorTime(-500);
   Serial.println("done");
   
   Serial.println("setup done");
@@ -103,13 +107,13 @@ void loop()
     loopCount = 0;
     statusLED = !statusLED;
     digitalWrite(13,statusLED);
-    // Serial.print("Current Orientation: "); Serial.println(angle);
+    Serial.print("Current Orientation: "); Serial.println(angle);
     // Serial.print("Awake for: "); Serial.print(sleepCount); Serial.println(" loops");
   }
 
   if (sleepCount >= loopsToSleep){sleep();}
 
-  // CONTROL
+   // CONTROL
   
   String command; // read commands sent by user
   command=readBLE();
