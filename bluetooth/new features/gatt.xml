@@ -2,7 +2,7 @@
 <configuration>
 
     <!-- 1800: org.bluetooth.service.generic_access -->
-    <service uuid="1800" id="generic_access" advertise="true">
+    <service uuid="1800">
         <description>Generic Access</description>
 
         <!-- 2A00: org.bluetooth.characteristic.gap.device_name -->
@@ -50,171 +50,137 @@
         <characteristic uuid="2A27" id="c_hardware_revision">
             <description>Hardware Revision</description>
             <properties read="true" const="true"/>
-            <value>1.0.0</value>
+            <value>1</value>
         </characteristic>
         
         <!-- 2A26: org.bluetooth.characteristic.firmware_revision_string -->
         <characteristic uuid="2A26" id="c_firmware_revision">
             <description>Firmware Revision</description>
             <properties read="true" const="true"/>
-            <value>1.0.0</value>
+            <value>0.0.0</value>
         </characteristic>
         
         <!-- 2A28: org.bluetooth.characteristic.software_revision_string -->
         <characteristic uuid="2A28" id="c_software_revision">
             <description>Software Revision</description>
             <properties read="true" const="true"/>
-            <value>1.0.0</value>
+            <value>0.0.0</value>
         </characteristic>
         
     </service>
 	
-	    <!-- 180F: org.bluetooth.service.battery_service -->
-    <service uuid="180F" advertise="true" id="battery_service">
-        <description>Battery Service</description> 
-        
-        <!-- 2A19: org.bluetooth.characteristic.battery_level -->
-        <characteristic uuid="2A19" id="c_battery_remaining">
-            <description>Battery Remaining</description>
-            <properties read="true"/>
-            <value type="user" />
-        </characteristic>
-        
-    </service>
-    
-    <!-- 1804: org.bluetooth.service.tx_power -->
-    <service uuid="1804" id="tx_power" >
-        <description>Tx Power</description>
-
-        <!-- 2A07: org.bluetooth.characteristic.tx_power_level -->
-        <characteristic uuid="2A07" id="c_tx_power_level">
-            <description>Tx Power Level</description>
-            <properties read="true"/>
-            <value type="hex" length="1" />
-        </characteristic>
-        
-    </service>
-	
-
-    <!-- 181C: org.bluetooth.service.user_data -->
-    <service uuid="181C" id="user_data">
-        <description>User Data</description>
-        <!-- 2A8A: org.bluetooth.characteristic.first_name -->
-        <characteristic uuid="2A8A" id="c_first_name">
-            <description>First Name</description>
-            <properties read="true" write="true" indicate="true"/>
-            <value variable_length="true" length="20" />
-			<!-- <security encrypt="true" /> -->
-        </characteristic>
-        
-        <!-- 2A90: org.bluetooth.characteristic.last_name -->
-        <characteristic uuid="2A90" id="c_last_name">
-            <description>Last Name</description>
-            <properties read="true" write="true" indicate="true"/>
-            <value variable_length="true" length="20" />
-        </characteristic>
-        
-        <!-- 2A87: org.bluetooth.characteristic.email_address -->
-        <characteristic uuid="2A87" id="c_email_address">
-            <description>Email Address</description>
-            <properties read="true" write="true" indicate="true"/>
-            <value  variable_length="true" length="20" />
-        </characteristic>
-	
-    </service>
-
-	
-	<!-- custom service for lock -->
-    <service uuid="FACE" id="lock_service" advertise="true">
+	<!-- custom service for lock
+    <service uuid="2CC734C0-9F0E-41C2-91B3-C1B4A9EFB487" id="lock_service" advertise="true">
         <description>AES SERVICE</description>
 		
-        <characteristic uuid="1CC734D0-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_key">
+		<--
+        <characteristic uuid="2CC734C1-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_key">
             <description>AES KEY</description>
             <properties indicate="true" />
             <value type="hex" length="16" />
         </characteristic>
+		
         
-        <characteristic uuid="1CC734D1-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_in">
+        <characteristic uuid="2CC734C2-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_in">
             <description>AES DATA IN</description>
             <properties read="true" write="true" indicate="true" />
             <value variable_length="true" type="hex" length="16" />
         </characteristic>
 		
-		<characteristic uuid="1CC734D2-9F0E-41C2-91B3-C1B4A9EFB487" id="c_enc_data">
+		<characteristic uuid="2CC734C3-9F0E-41C2-91B3-C1B4A9EFB487" id="c_enc_data">
             <description>ENCRYPTED DATA</description>
             <properties read="true" indicate="true" />
             <value variable_length="true" type="hex" length="16" />
         </characteristic>
         
-        <characteristic uuid="1CC734D3-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_out">
+        <characteristic uuid="2CC734C4-9F0E-41C2-91B3-C1B4A9EFB487" id="c_aes_out">
             <description>AES DATA OUT</description>
             <properties read="true" indicate="true" />
             <value variable_length="true" type="hex" length="16" />
         </characteristic>
 		
 	</service>
+	-->
 	
 	<!-- custom service for lock -->
-    <service uuid="FADE" id="lock_service" advertise="true">
+    <service uuid="2CC734D0-9F0E-41C2-91B3-C1B4A9EFB487" advertise="true">
         <description>Lock Service</description>
 		
-        <characteristic uuid="2CC734D0-9F0E-41C2-91B3-C1B4A9EFB487" id="c_open_or_close">
+        <characteristic uuid="2CC734D1-9F0E-41C2-91B3-C1B4A9EFB487" id="c_open_or_close">
             <description>Open Or Close</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
         </characteristic>
         
-        <characteristic uuid="2CC734D1-9F0E-41C2-91B3-C1B4A9EFB487" id="c_is_locked">
+        <characteristic uuid="2CC734D2-9F0E-41C2-91B3-C1B4A9EFB487" id="c_is_locked">
             <description>Is Locked</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
         </characteristic>
         
-        <characteristic uuid="2CC734D2-9F0E-41C2-91B3-C1B4A9EFB487" id="c_key_phone_or_website">
+        <characteristic uuid="2CC734D3-9F0E-41C2-91B3-C1B4A9EFB487" id="c_key_phone_or_website">
             <description>Key, Phone, Or Website</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
         </characteristic>
         
-        <characteristic uuid="2CC734D3-9F0E-41C2-91B3-C1B4A9EFB487" id="c_time_accessed">
+        <characteristic uuid="2CC734D4-9F0E-41C2-91B3-C1B4A9EFB487" id="c_time_accessed">
             <description>Time Accessed</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="20" />
         </characteristic>
         
-        <characteristic uuid="2CC734D4-9F0E-41C2-91B3-C1B4A9EFB487" id="c_lock_notification">
+        <characteristic uuid="2CC734D5-9F0E-41C2-91B3-C1B4A9EFB487" id="c_lock_notification">
             <description>Lock Notification</description>
             <properties read="true" write="true" indicate="true"/>
             <value type="hex" length="1" />
         </characteristic>
-        
-    </service>
-    
-	<!-- custom service for data transmission test -->
-    <service uuid="CAFE" id="read_write_service" advertise="true">
-        <description>Read/Write Service</description>
 
-        <characteristic uuid="195AE580-437A-489B-B0CD-B7C9C394BAE4" id="c_tx">
+        <characteristic uuid="2CC734D6-9F0E-41C2-91B3-C1B4A9EFB487" id="c_tx">
             <description>TX</description>
             <properties read="true" write="true" indicate="true"/>
             <value variable_length="true" length="20" />
         </characteristic>
 
-        <characteristic uuid="195AE581-437A-489B-B0CD-B7C9C394BAE4" id="c_rx">
+        <characteristic uuid="2CC734D7-9F0E-41C2-91B3-C1B4A9EFB487" id="c_rx">
             <description>RX</description>
             <properties read="true" write="true" indicate="true"/>
             <value variable_length="true" length="20" />
         </characteristic>
 
-        <characteristic uuid="195AE582-437A-489B-B0CD-B7C9C394BAE4" id="c_data3">
+        <characteristic uuid="2CC734D8-9F0E-41C2-91B3-C1B4A9EFB487" id="c_data3">
             <description>Data 3</description>
-            <properties read="true" write="true" indicate="true" authenticated_read="true" authenticated_write="true"/>
+            <properties read="true" write="true" indicate="true"/>
             <value variable_length="true" length="20" />
         </characteristic>
 
-        <characteristic uuid="195AE583-437A-489B-B0CD-B7C9C394BAE4" id="c_unack">
+        <characteristic uuid="2CC734D9-9F0E-41C2-91B3-C1B4A9EFB487" id="c_unack">
             <description>Unacknowledged Data</description>
-            <properties read="true" write_no_response="true" notify="true" authenticated_read="true" authenticated_write="true"/>
+            <properties read="true" write_no_response="true" notify="true" />
+            <value variable_length="true" length="20" />
+        </characteristic>
+		
+		<characteristic uuid="2CC734DA-9F0E-41C2-91B3-C1B4A9EFB487" id="c_first_name">
+            <description>First Name</description>
+            <properties read="true" write="true" indicate="true"/>
+            <value variable_length="true" length="20" />
+        </characteristic>
+
+        <characteristic uuid="2CC734DB-9F0E-41C2-91B3-C1B4A9EFB487" id="c_last_name">
+            <description>Last Name</description>
+            <properties read="true" write="true" indicate="true"/>
+            <value variable_length="true" length="20" />
+        </characteristic>
+
+        <characteristic uuid="2CC734DC-9F0E-41C2-91B3-C1B4A9EFB487" id="c_email_address">
+            <description>Email Address</description>
+            <properties read="true" write="true" indicate="true"/>
+            <value variable_length="true" length="20" />
+        </characteristic>
+		
+		<characteristic uuid="2CC734DD-9F0E-41C2-91B3-C1B4A9EFB487" id="c_phone_number">
+            <description>Phone Number</description>
+            <properties read="true" write="true" indicate="true"/>
             <value variable_length="true" length="20" />
         </characteristic>
 

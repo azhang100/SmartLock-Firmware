@@ -18,7 +18,7 @@ dim lock_notification
 
 dim aesIn(16)
 dim aesOut(16)
-dim aesKey(16)
+#dim aesKey(16)
 dim enc_data(16)
 dim res_len
 
@@ -40,25 +40,25 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
 	
 	
 
-
+	# Generic service
     # write custom device name to local GATT attribute
-    call attributes_write(c_device_name, 0, 18, "My SimSim")
+    call attributes_write(c_device_name, 0, 18, "SimSim Debugger")
 	
 	
 	
 	
-	aesIn(0:16) = "hellohellohelloh"
-	call attributes_write(c_aes_in, 0, 16, aesIn(0:16))
+	#aesIn(0:16) = "hellohellohelloh"
+	#call attributes_write(c_aes_in, 0, 16, aesIn(0:16))
 	
 	#aesKey(0:16) = "ug7c7FtuEB6TUzWj"
 	#call attributes_write(c_aes_key, 0, 16, aesKey(0:16))
 	#call system_aes_setkey(16, aesKey(0:16))
 	
-	call system_aes_encrypt(16, aesIn(0:16))(res_len, enc_data(0:16))
-	call attributes_write(c_enc_data, 0, 16, enc_data(0:16))
+	#call system_aes_encrypt(16, aesIn(0:16))(res_len, enc_data(0:16))
+	#call attributes_write(c_enc_data, 0, 16, enc_data(0:16))
 	
-	call system_aes_decrypt(res_len, enc_data(0:16))(res_len, aesOut(0:16))
-	call attributes_write(c_aes_out, 0, 16, aesOut(0:16))
+	#call system_aes_decrypt(res_len, enc_data(0:16))(res_len, aesOut(0:16))
+	#call attributes_write(c_aes_out, 0, 16, aesOut(0:16))
     
 	
 	
@@ -77,7 +77,8 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     #adv_data(4:1) = gap_ad_type_txpower    # ad field type = 0x0A (TX Power)
     #adv_data(5:1) = $03 # TX power in dBm
 	
-	call attributes_write(c_tx_power_level, 0, 1, $03)
+	# Tx power service
+	#call attributes_write(c_tx_power_level, 0, 1, $03)
 		
     # NOTE: TX power is a signed 8-bit value, and is not changed automatically
     # when using "hardware_set_txpower(<power>)". This may be anywhere from -23
@@ -98,11 +99,13 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
 
 
 	
+	# User Data Service
+	#call attributes_write(c_first_name, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
+	#call attributes_write(c_last_name, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
+	#call attributes_write(c_email_address, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
 	
-	call attributes_write(c_first_name, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
-	call attributes_write(c_last_name, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
-	call attributes_write(c_email_address, 0, 20, "abcdefghijklmopqrstuvwxyz1234567890")
 	
+	# Lock service
 	call attributes_write(c_open_or_close, 0, 1, open_or_close)
 	call attributes_write(c_is_locked, 0, 1, is_locked)
 	call attributes_write(c_key_phone_or_website, 0, 1, key_phone_or_website)
@@ -121,12 +124,12 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call gap_set_adv_data(0, 13, adv_data(0:13))
     
     # set custom scan response data (i.e. the Device Name value)
-    call gap_set_adv_data(1, 20, sr_data(0:20))
+    #call gap_set_adv_data(1, 20, sr_data(0:20))
 
     # put module into discoverable/connectable mode (with user-defined advertisement data)
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
 	
-	#call hardware_set_soft_timer(1920000, 0, 0)
+	#call hardware_set_soft_timer(1920000, 1, 0)
 end
 
 
@@ -161,11 +164,12 @@ end
         
 # This means we must scale [+17616, +23342] to [0, +100]
 
-event attributes_user_read_request(connection, handle, offset, maxsize)
-    if handle = c_battery_remaining then
-        call hardware_adc_read(15, 3, 0)
-    end if
-end
+# Battery service
+#event attributes_user_read_request(connection, handle, offset, maxsize)
+#    if handle = c_battery_remaining then
+#        call hardware_adc_read(15, 3, 0)
+#    end if
+#end
 
 event hardware_adc_result(input, value)
     # check for internal AVDD/3 result (battery channel)
