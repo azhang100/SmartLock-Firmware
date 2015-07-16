@@ -28,27 +28,27 @@ void controlMotor(char command){
   int desiredDirection = settings.turnDirection.getData();
   float angleFromAccelerometer;
   
-  if (command=='u' && isLocked==true) 
+  if (command=='u') 
   {  desiredAngle = settings.unlockedAngle.getData(); desiredDirection = settings.turnDirection.getData(); motorActive = true;
-      Serial.println("please unlock"); Serial.println(settings.unlockedAngle.getData());
+      debugPrintln("please unlock"); debugPrintlnInt(settings.unlockedAngle.getData());
   }
-  else if (command=='l' && isLocked==false)
+  else if (command=='l')
   {
     desiredAngle = settings.lockedAngle.getData(); desiredDirection = -settings.turnDirection.getData(); motorActive = true;
-     Serial.println("please lock"); Serial.println(settings.lockedAngle.getData());
+     debugPrintln("please lock"); debugPrintlnInt(settings.lockedAngle.getData());
   }  
   
   while(motorActive == true)
   {
     angleFromAccelerometer = getAngle();
-      Serial.println("current angle:");     Serial.println(angleFromAccelerometer);
-      Serial.println("desired angle:");     Serial.println(desiredAngle);
+      debugPrintln("current angle:");     debugPrintlnInt(angleFromAccelerometer);
+      debugPrintln("desired angle:");     debugPrintlnInt(desiredAngle);
         
     //Moves slightly closer to desiredAngle in desiredDirection
     if (abs(angleFromAccelerometer - desiredAngle) < MOTOR_ANGLE_BUFFER )
     {
       // reached position
-         Serial.println("yay reached my destination");
+         debugPrintln("yay reached my destination");
       motorOut(0);
       motorActive = false;
        if (command=='u') 
@@ -62,7 +62,7 @@ void controlMotor(char command){
     }
     else
     {
-      // Serial.println("keep driving");
+      // debugPrintln("keep driving");
       motorOut(settings.power.getData()*desiredDirection);
     }
   }

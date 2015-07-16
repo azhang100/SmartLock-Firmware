@@ -41,11 +41,11 @@ void motorOut(int rotationalVelocity){
   int dutyCycle = rotationalVelocity;
   
   if (dutyCycle > MOTOR_DUTY_BUFFER)
-  {analogWrite(MOTOR_B_PWM, dutyCycle);analogWrite(MOTOR_B_DIR, 0);Serial.println("forwards");}
+  {analogWrite(MOTOR_B_PWM, dutyCycle);analogWrite(MOTOR_B_DIR, 0);debugPrintln("forwards");}
   
   else if (dutyCycle < -MOTOR_DUTY_BUFFER)
-  {analogWrite(MOTOR_B_DIR, -dutyCycle);analogWrite(MOTOR_B_PWM, 0);Serial.println("backwards");}
+  {analogWrite(MOTOR_B_DIR, -dutyCycle);analogWrite(MOTOR_B_PWM, 0);debugPrintln("backwards");}
   
   else
-  {analogWrite(MOTOR_B_PWM, 0);analogWrite(MOTOR_B_DIR, 0);Serial.println("stop");}
+  {analogWrite(MOTOR_B_PWM, 0);analogWrite(MOTOR_B_DIR, 0);debugPrintln("stop");}
 }

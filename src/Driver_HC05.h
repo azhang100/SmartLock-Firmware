@@ -6,12 +6,6 @@
 #define		BAUD_RATE          9600
 
 //**********************************************************************************************//
-//					GLOBAL VARIABLES				 	//
-//**********************************************************************************************//
-
-SoftwareSerial BLE(3, 4); // RX, TX
-
-//**********************************************************************************************//
 //				   EXPOSED FUNCTIONS				 	//
 //**********************************************************************************************//
 
@@ -24,19 +18,19 @@ String readBLE();               // returns text from BLE
 
 void BLE_init()
 {
-  BLE.begin(BAUD_RATE);
-  BLE.println("BLE online");
+  BLEBegin(BAUD_RATE);
+  BLEPrintln("BLE online");
 }
 
 String readBLE(){
   String outputString = "";
-  if (BLE.available()){
-    while (BLE.available()) {
-      char inChar = (char)BLE.read();
+  if (BLEAvailable()){
+    while (BLEAvailable()) {
+      char inChar = (char)BLERead();
       outputString += inChar;
     }
   }
   if(outputString.length() > 0)
-  {BLE.print("Got String: "); BLE.println(outputString);}
+  {BLEPrint("Got String: "); BLEPrintln(outputString);}
   return outputString;
 }

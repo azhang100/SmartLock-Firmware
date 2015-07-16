@@ -15,15 +15,13 @@ Z...Z is the actual message, which is a series of bytes
 //					DEFINES						 	//
 //**********************************************************************************************//
 
-#define		BAUD_RATE          38400
+#define	      	BAUD_RATE          38400
 #define         BLE_MODE_DELAY     500
 #define         BLE_INPUT_DELAY    1
 
 //**********************************************************************************************//
 //					GLOBAL VARIABLES				 	//
 //**********************************************************************************************//
-
-SoftwareSerial BLE(3, 4); // RX, TX
 
 int reset_evt[16]={0x80, 0x0C, 0x00, 0x00, 0x01, 0x00, 0x03, 0x00, 0x02, 0x00 ,0x7A, 0x00, 0x03, 0x00, 0x01, 0x07};
 int setup_evt[6]={0x00, 0x02, 0x06, 0x01, 0x00, 00};
@@ -49,8 +47,6 @@ String readBLE();               // returns text from BLE
 //**********************************************************************************************//
 
 void sendCommand(int len, int command[]);
-String interpret();
-int getNextData();
 
 //**********************************************************************************************//
 //					FUNCTIONS					 	//
@@ -59,74 +55,54 @@ int getNextData();
 void BLE_init()
 {
   int i=0;
-  BLE.begin(BAUD_RATE);
+  BLEBegin(BAUD_RATE);
   delay(BLE_MODE_DELAY);    //wait to reset the ble
   
-  Serial.println("Setup...");
+  debugPrintln("Setup...");
   sendCommand(7,setup_cmd);
-  Serial.println("Bond...");
+  BLERead();
+  debugPrintln("Bond...");
   sendCommand(6,bond_cmd);
-  Serial.println("Mitm...");
+  BLERead();
+  debugPrintln("Mitm...");
   sendCommand(8,mitm_cmd);  
+  BLERead();
 }
 
 String readBLE() {
   String outputString = "";
-  if (BLE.available()){
+  if (BLEAvailable()){
     int i;
-    int eventType = getNextData();
+    int eventType = BLERead();
     
     if (eventType == 128){ // data[0]==128 means that it has an actual value
-      for (i=0; i<9; i++){getNextData();} // burn values data[1:10]
-      int lengthOfMessage = getNextData();
+      for (i=0; i<9; i++){BLERead();} // burn values data[1:10]
+      int lengthOfMessage = BLERead();
       
       char inChar;
       for (i=0; i<lengthOfMessage; i++){
-        inChar = (char)getNextData(); 
+        inChar = (char)BLERead(); 
         outputString += inChar;
       }
-    Serial.print("Got String: ");Serial.println(outputString);  
-    Serial.print("String Len: ");Serial.println(outputString.length());
+    debugPrint("Got String: ");debugPrintln(outputString);  
+    //debugPrint("String Len: ");debugPrintln(outputString.length());
       //return outputString;
     }
     else {
-      Serial.println("Got Unknown Command");
+      debugPrintln("Got Unknown Command");
       //return outputString;
     }
   }
   if(outputString.length() > 0)
-  {Serial.print("Got String: ");Serial.println(outputString);}
+  {debugPrint("Got String: ");debugPrintln(outputString);}
   return outputString;
 }
 
 void sendCommand(int len, int command[]){
   int i;
   for(i=0; i<len; i++){
-    BLE.write(command[i]);
+    BLEWrite(command[i]);
     delay(BLE_INPUT_DELAY);
   }
   delay(BLE_MODE_DELAY);
-}
-
-String interpret(){
-  int i;
-  String inputString = "";
-  int eventType = BLE.read();
-  if (eventType == 128){ // data[0] means that it has an actual value
-    for (i=0; i<9; i++){getNextData();} // burn values data[1:10]
-    int lengthOfMessage = getNextData();
-    
-    char inChar;
-    for (i=0; i<lengthOfMessage; i++){
-      inChar = (char)getNextData(); 
-      inputString += inChar;
-    }
-  }
-  return inputString;
-}
-
-int getNextData(){ // returns next byte in serial com
-  int data = BLE.read();
-  Serial.print("Got Byte: ");Serial.println(data);
-  return data;
 }

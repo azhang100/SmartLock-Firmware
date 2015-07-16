@@ -45,7 +45,8 @@ AccelData accelData;
 //**********************************************************************************************//
 
 //#include "Driver_MPU6050.h"
-#include "Driver_LIS3DH.h"
+//#include "Driver_LIS3DH.h"
+#include "Driver_noAccel.h"
 
 //**********************************************************************************************//
 //           FUNCTIONS DECLARATIONS         //
@@ -62,6 +63,8 @@ int getAngle(){
   accelData.xVal.filterData(accelData.outX);
   accelData.yVal.filterData(accelData.outY);
   accelData.zVal.filterData(accelData.outZ);
-  int angle=(180*atan2(accelData.xVal.value,accelData.yVal.value)/PI);
-  return angle + 180;
+  int angle=(180*atan2(accelData.xVal.value,accelData.zVal.value)/PI);
+  angle = angle + 180;
+  angle = map(angle,0,360,0,255);
+  return angle;
 }

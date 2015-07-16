@@ -67,30 +67,31 @@ void loop();
 
 //The arduino runs the setup function first
 void setup() 
-{
-  
+{ 
   pinMode(13,OUTPUT);
+  digitalWrite(13,HIGH);
   pinMode(12,OUTPUT);
   pinMode(11,OUTPUT);
 
   debug_init();
   
-  Serial.println("init accel...");
+  debugPrintln("init accel...");
   accel_init(); // should be done as early as possible to give it as much time to calibrate
-  Serial.println("done");
+  debugPrintln("done");
   
-  Serial.println("init ble...");
+  debugPrintln("init ble...");
   BLE_init();
-  Serial.println("done");
+  debugPrintln("done");
   
-  Serial.println("init motor...");
+  debugPrintln("init motor...");
   motor_init();
-  Serial.println("motor hard test");
-  motorTime(500);
-  motorTime(-500);
-  Serial.println("done");
+  debugPrintln("motor hard test");
+  motorTime(200);
+  delay(100);
+  motorTime(-200);
+  debugPrintln("done");
   
-  Serial.println("setup done");
+  debugPrintln("setup done");
 }
 
 
@@ -107,8 +108,8 @@ void loop()
     loopCount = 0;
     statusLED = !statusLED;
     digitalWrite(13,statusLED);
-    Serial.print("Current Orientation: "); Serial.println(angle);
-    // Serial.print("Awake for: "); Serial.print(sleepCount); Serial.println(" loops");
+    debugPrint("Current Orientation: "); debugPrintlnInt(angle);
+    // debugPrint("Awake for: "); debugPrint(sleepCount); debugPrintlnInt(" loops");
   }
 
   if (sleepCount >= loopsToSleep){sleep();}
@@ -124,7 +125,7 @@ void loop()
 
 void recievedCommand(String command){
   if (command.length() > 0){
-    Serial.print("Got Command: ");Serial.println(command);
+    debugPrint("Got Command: ");debugPrintln(command);
     // execute the user commands
     executeCommandFromUser(command);
     debugCommandFromUser(command);
@@ -135,5 +136,3 @@ void recievedCommand(String command){
 //**********************************************************************************************//
 //					HELPER FUNCTIONS  				 	//
 //**********************************************************************************************//
-
-

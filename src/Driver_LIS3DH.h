@@ -54,7 +54,7 @@ void accel_init(){
 
 int getData(){
  // read STATUS_REG 
-  while (ready == false ){
+  while (ready == false){
     Wire.beginTransmission(ADDRESS_LIS3DH); 
     Wire.write(STATUS_REG); 
     Wire.endTransmission(); 
@@ -69,7 +69,7 @@ int getData(){
   }
     
   if (bitRead(statusReg, 7 ) == 1 ){
-     // Serial.println( " Some data have been overwritten. " ); 
+     // debugPrintln( " Some data have been overwritten. " ); 
   }
   // read the result 
   Wire.beginTransmission(ADDRESS_LIS3DH); 
