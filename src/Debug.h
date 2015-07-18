@@ -25,7 +25,7 @@ byte BLERead()              {return Serial.read();}
 
 //==========Quick remapping===========//
 
-  SoftwareSerial BLE(4, 3); // RX, TX
+  SoftwareSerial BLE(3, 4); // RX, TX
   // SoftwareSerial debug(3, 4);
   
   void debugBegin(long i)     {Serial.begin(i);}
