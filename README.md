@@ -5,11 +5,20 @@ https://docs.google.com/spreadsheets/d/19ZyzZuSoSpPwH2bXSZDw7PbBoHNsoOeRNcEBVYKH
 
 Commands supported:
 lock door: aCMDLCK
+
 unlock door: aCMDULK
+
 set lock angle: aCMDLKA
+
 set unlock angle: aCMDULA
+
 set power: aCFGPWR255
 
+set mobile num + AES key:
+
+get lockstatus:
+
+get batterystatus:
 
 
 ###Protocol:
