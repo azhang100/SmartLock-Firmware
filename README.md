@@ -4,6 +4,9 @@
 https://docs.google.com/spreadsheets/d/19ZyzZuSoSpPwH2bXSZDw7PbBoHNsoOeRNcEBVYKHNQs/edit?usp=sharing
 
 Commands supported:
+
+get public key of lock: getPubKey
+
 lock door: aCMDLCK
 
 unlock door: aCMDULK
@@ -14,11 +17,13 @@ set unlock angle: aCMDULA
 
 set power: aCFGPWR255
 
-set mobile num + AES key:
+set tx power level: txPWR255
 
-get lockstatus:
+set mobile num: /4122099231/
 
-get batterystatus:
+AES key: /16 bytes/
+
+get lock status: getLockStatus
 
 
 ###Protocol:
