@@ -15,15 +15,22 @@ set lock angle: aCMDLKA
 
 set unlock angle: aCMDULA
 
-set power: aCFGPWR255
+set power: aCFGPWR9
 
-set tx power level: txPWR255
+set tx power level: txPWR9
 
-set mobile num: /4122099231/
+set mobile num: MN4122099231
 
-AES key: /16 bytes/
+AES key: KEY16 bytes
+
+delete user: MN4122099231
 
 get lock status: getLockStatus
+
+update BLE firmware: updateFirmBle
+
+update MPU firmware: updateFirmMPU
+
 
 
 ###Protocol:
