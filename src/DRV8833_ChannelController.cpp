@@ -23,12 +23,12 @@ DRV8833_ChannelController::DRV8833_ChannelController(int pinIN_1, int pinIN_2,
 {
 }
 
-void DRV8833_ChannelController::init()
+void DRV8833_ChannelController::init(LockSystemController * lsc)
 {
 #ifdef MOTOR_CONTROLLER_DEBUG
 	debugPrintln(F("DRV8833::init"));
 #endif
-	MotorController::init();
+	MotorController::init(lsc);
 	pinMode( pinIN_2, OUTPUT );
 	pinMode( pinIN_1, OUTPUT );
 	pinMode( pinSleep, OUTPUT );

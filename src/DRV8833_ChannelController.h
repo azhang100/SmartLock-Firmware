@@ -21,7 +21,7 @@ public:
 	DRV8833_ChannelController(int pinIN_1, int pinIN_2, int pinSleep, int pinFault,
 			LockAccelerometerObserver *observer, int dirSign = 1,
 			unsigned int minPower = 80);
-	virtual void init(); //decouple init operations from instantiation
+	virtual void init(LockSystemController * lsc); //decouple init operations from instantiation
 
 protected:
 	void applyMotorStopCommands();

@@ -129,12 +129,12 @@ void setup()
 #endif
   
 #ifdef MOTOR_CONTROLLER_TEST
-	gMotorController.init();
+	gMotorController.init(&gLockSystemController);
 	gMCT.init();
 #else
 	debugPrintln(F("init motor..."));
 	// motor_init();
-	gMotorController.init();
+	gMotorController.init(&gLockSystemController);
 	/*
 	debugPrintln(F("motor hard test"));
 	//motorTime(500);

@@ -11,6 +11,7 @@
 
 
 #include "MotorController.h"
+#include "LockSystemController.h"
 //#include "StringConsts.h"
 #include <Arduino.h>
 #include "Debug.h"
@@ -29,7 +30,8 @@ MotorController::MotorController(LockAccelerometerObserver * observer,
 {
 }
 
-void MotorController::init() {
+void MotorController::init(LockSystemController * lsc) {
+	myLSC = lsc;
 }
 
 void MotorController::timeSlice() {
@@ -74,8 +76,9 @@ void MotorController::timeSlice() {
 				int elapsed = millis() - driveStartTime_ms;
 				if (elapsed > maxEngageTime_ms)
 				{
-					newState(blocked);
 					cmdCoast();
+					newState(blocked);
+					myLSC->motorStuck();
 				}
 			}
 			break;
@@ -86,30 +89,33 @@ void MotorController::timeSlice() {
 				int progress = currentAngle - lastTimeSliceAngle;
 				lastTimeSliceAngle = currentAngle;
 
-					switch (driveMode) {
-						case ForDuration:
+				switch (driveMode) {
+					case ForDuration:
+						{
+							if (elapsed >= targetTime_ms)
 							{
-								if (elapsed >= targetTime_ms)
-								{
-									cmdStop(); // changes state
+								cmdStop(); // changes state
+								myLSC->motorComplete();
 								return;
-								}
 							}
-							break;
-						case ToPosition:
-							{
+						}
+						break;
+					case ToPosition:
+						{
 							if (abs(currentAngle - targetAngle) < positionThreshhold)
-								{
-									cmdStop(); // changes state
+							{
+								cmdStop(); // changes state
+								myLSC->motorComplete();
 								return;
-								}
 							}
-							break;
-					}
+						}
+						break;
+				}
 				if (abs(progress) < minimumProgress && desiredPower != 0)
 				{
 					cmdCoast();
 					newState(blocked);
+					myLSC->motorStuck();
 				}
 			}
 			break;
@@ -199,7 +205,7 @@ void MotorController::cmdDriveMotorToPosition(Direction direction, int power, in
 void MotorController::cmdDriveMotorForDuration(Direction direction, int power, unsigned long targetMs) {
 	if (power < minPower) {
 #ifdef MOTOR_CONTROLLER_DEBUG
-	debugPrintln(F("MC:cmdDFD power too low"));
+		debugPrintln(F("MC:cmdDFD power too low"));
 #endif
 		return;
 	}
@@ -225,9 +231,9 @@ void MotorController::cmdDriveMotorForDuration(Direction direction, int power, u
 #ifdef MOTOR_CONTROLLER_DEBUG
 				debugPrint(F("MC:cmdDFD start ")); debugPrintln(driveStartTime_ms);
 #endif
-					newState(engaging);
+				newState(engaging);
 				return;
-				}
+			}
 			break;
 		case driving:
 			{

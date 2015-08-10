@@ -23,6 +23,8 @@
 #include <Arduino.h>
 #endif
 
+class LockSystemController;
+
 class MotorController : public Runnable {
 #ifdef MOTOR_CONTROLLER_TEST
 	friend class MotorControllerTest;
@@ -34,7 +36,7 @@ class MotorController : public Runnable {
 
 		MotorController(LockAccelerometerObserver * observer,
 				unsigned int minPower = 80, int dirSign = 1);
-		virtual void init(); //decouple init operations from instantiation
+		virtual void init(LockSystemController * lsc); //decouple init operations from instantiation
 
 		virtual void timeSlice();
 		void cmdStop();
@@ -68,6 +70,7 @@ class MotorController : public Runnable {
 		unsigned long contiguousFaults;
 
 		int positionThreshhold;
+		LockSystemController * myLSC;
 
 	private:
 		void newState(State ns);
