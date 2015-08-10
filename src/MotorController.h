@@ -17,7 +17,7 @@
 #include "LockAccelerometerObserver.h"
 
 #define MOTOR_CONTROLLER_TEST
-#undef MOTOR_CONTROLLER_DEBUG
+#define MOTOR_CONTROLLER_DEBUG
 
 #ifdef MOTOR_CONTROLLER_DEBUG
 #include <Arduino.h>
@@ -94,6 +94,7 @@ class MotorControllerTest : public Runnable
 		static const PROGMEM char * const DIRECTION;
 		static const PROGMEM char * const POWER;
 		static const PROGMEM char * const DUR;
+		static const PROGMEM char * const POS;
 		static const PROGMEM char * const OR;
 		static const PROGMEM char * const CW;
 		static const PROGMEM char * const CCW;
@@ -104,10 +105,12 @@ class MotorControllerTest : public Runnable
 		const char * p_selDir[12] = { PLEASE, SPACE, ENTER, SPACE, DIRECTION, SPACE, CW, SPACE, OR, SPACE, CCW, NULL };
 		const char * p_selPower[6] = { PLEASE, SPACE, ENTER, SPACE, POWER, NULL };
 		const char * p_selDur[6] = { PLEASE, SPACE, ENTER, SPACE, DUR, NULL };
+		const char * p_selPos[6] = { PLEASE, SPACE, ENTER, SPACE, POS, NULL };
 
 		void timeSlice();
 		void input(const char * in);
 		void input_DFD(const char * in);
+		void input_DTP(const char * in);
 		void input_DRV(const char * in);
 		void init();
 		void p(const char * msg, bool doNL = false);
@@ -115,17 +118,20 @@ class MotorControllerTest : public Runnable
 		void p(int i, bool doNL = false);
 		void pp(const char * msgs[], bool doNL = false);
 		enum Scenario { idle = 0, DFD = 1, DTP = 2, DRV = 3, END = 4 };
-		enum StateDFD { initial, waitForDir, waitForPower, waitForDuration,
+		enum State { initial, waitForDir, waitForPower, waitForDuration, waitForPosition,
 			checkDriving, checkComplete,
 			success, failure };
 	private:
 		void timeSlice_DFD();
+		void timeSlice_DTP();
 		void timeSlice_DRV();
-		void newState_DFD(StateDFD ns);
+		void newState_DFD(State ns);
+		void newState_DTP(State ns);
 		void newScen(Scenario s);
 
 		Scenario scen;
-		StateDFD s_DFD;
+		State s_DFD;
+		State s_DTP;
 		unsigned long scenEntryTime_ms;
 		unsigned long stateEntryTime_ms;
 		const unsigned int msToPrompt = 10000;
@@ -133,6 +139,8 @@ class MotorControllerTest : public Runnable
 		MotorController::Direction dir;
 		int power;
 		uint16_t duration;
+		int16_t targetPosition;
+		int16_t currentPosition;
 		int exitCode;
 };
 #endif

@@ -26,7 +26,7 @@ MotorController::MotorController(LockAccelerometerObserver * observer,
 	targetAngle(0), targetTime_ms(0), directionSign(dirSign),
 	desiredPower(0), maxEngageTime_ms(500), myObserver(observer),
 	lastTimeSliceAngle(myObserver->getLockAngleDeg()), minimumProgress(10),
-	minPower(minPower), positionThreshhold(2)
+	minPower(minPower), positionThreshhold(10)
 {
 }
 
@@ -331,6 +331,7 @@ const PROGMEM char * const MotorControllerTest::SCENARIO = "scenario";
 const PROGMEM char * const MotorControllerTest::DIRECTION = "direction";
 const PROGMEM char * const MotorControllerTest::POWER = "power";
 const PROGMEM char * const MotorControllerTest::DUR = "duration";
+const PROGMEM char * const MotorControllerTest::POS = "position";
 const PROGMEM char * const MotorControllerTest::OR = "or";
 const PROGMEM char * const MotorControllerTest::CW = "CW";
 const PROGMEM char * const MotorControllerTest::CCW = "CCW";
@@ -338,7 +339,7 @@ const PROGMEM char * const MotorControllerTest::FAILURE = "FAILURE";
 const PROGMEM char * const MotorControllerTest::SUCCESS = "SUCCESS";
 
 MotorControllerTest::MotorControllerTest(MotorController * mc) :
-	mc(mc), scen(idle), s_DFD(initial), exitCode(-1)
+	mc(mc), scen(idle), s_DFD(initial), s_DTP(initial), exitCode(-1)
 {
 }
 
@@ -395,6 +396,9 @@ void MotorControllerTest::timeSlice()
 		case DFD:
 			timeSlice_DFD();
 			break;
+		case DTP:
+			timeSlice_DTP();
+			break;
 		case DRV:
 			timeSlice_DRV();
 			break;
@@ -439,6 +443,7 @@ void MotorControllerTest::timeSlice_DRV()
 	}
 	lastMode = mode;
 }
+
 void MotorControllerTest::timeSlice_DFD()
 {
 	unsigned long timeSliceStart_ms = millis();
@@ -515,11 +520,90 @@ void MotorControllerTest::timeSlice_DFD()
 	}
 }
 
+void MotorControllerTest::timeSlice_DTP()
+{
+	unsigned long timeSliceStart_ms = millis();
+	int16_t currentPosition = mc->myObserver->getLockAngleDeg();
+	switch (s_DTP) {
+		case initial:
+			pp(p_selDir, true);
+			newState_DTP(waitForDir);
+			break;
+		case waitForDir:
+			if (timeSliceStart_ms - stateEntryTime_ms > msToPrompt) {
+				pp(p_selDir, true);
+				newState_DTP(waitForDir);
+			}
+			break;
+		case waitForPower:
+			if (timeSliceStart_ms - stateEntryTime_ms > msToPrompt) {
+				pp(p_selPower, true);
+				newState_DTP(waitForPower);
+			}
+			break;
+		case waitForPosition:
+			if (timeSliceStart_ms - stateEntryTime_ms > msToPrompt) {
+				pp(p_selPos, true);
+				newState_DTP(waitForPosition);
+			}
+			break;
+		case checkDriving:
+			if (mc->state == MotorController::blocked)
+			{
+				exitCode = 2;
+				newState_DTP(failure);
+			}
+			if (abs(currentPosition-targetPosition) > mc->positionThreshhold)
+			{
+				if (mc->state != MotorController::driving)
+				{
+					exitCode = 3;
+					newState_DTP(failure);
+				}
+			}
+			else
+			{
+				newState_DTP(checkComplete);
+			}
+			break;
+		case checkComplete:
+			if (mc->state != MotorController::stopped)
+			{
+				exitCode = 4;
+				newState_DTP(failure);
+			}
+			else
+			{
+				exitCode = 0;
+				newState_DTP(success);
+			}
+			break;
+		case success:
+			newState_DTP(initial);
+			p(SUCCESS);
+			p(exitCode, true);
+			init();
+			break;
+		case failure:
+			p(FAILURE);
+			p(exitCode, true);
+			newState_DTP(initial);
+			init();
+			break;
+	}
+}
 
-void MotorControllerTest::newState_DFD(StateDFD ns)
+
+void MotorControllerTest::newState_DFD(State ns)
 {
 	stateEntryTime_ms = millis();
 	s_DFD = ns;
+}
+
+void MotorControllerTest::newState_DTP(State ns)
+{
+	stateEntryTime_ms = millis();
+	s_DTP = ns;
 }
 
 void MotorControllerTest::newScen(Scenario s)
@@ -540,6 +624,9 @@ void MotorControllerTest::input(const char * in)
 				break;
 			case DFD:
 				input_DFD(in);
+				break;
+			case DTP:
+				input_DTP(in);
 				break;
 			case DRV:
 				input_DRV(in);
@@ -596,6 +683,61 @@ void MotorControllerTest::input_DFD(const char * in)
 			}
 			else {
 				pp(p_selDur, true);
+			}
+			break;
+	}
+}
+
+void MotorControllerTest::input_DTP(const char * in)
+{
+	int inval;
+	switch (s_DTP) {
+		case waitForDir:
+			if (strcmp(in, CW) == 0) {
+				dir = MotorController::CW;
+				pp(p_selPower, true);
+				newState_DTP(waitForPower);
+			}
+			else if (strcmp(in, CCW) == 0) {
+				dir = MotorController::CCW;
+				pp(p_selPower, true);
+				newState_DTP(waitForPower);
+			}
+			else {
+				pp(p_selDir, true);
+			}
+			break;
+		case waitForPower:
+			inval =  atoi(in);
+			if (inval > 0 && inval < 256) {
+				power = inval;
+				pp(p_selPos, true);
+				newState_DTP(waitForPosition);
+			}
+			else {
+				pp(p_selPower, true);
+			}
+			break;
+		case waitForPosition:
+			inval =  atoi(in);
+			if ((dir == MotorController::CW && inval > currentPosition) ||
+					(dir == MotorController::CCW && inval < currentPosition))
+			{
+				targetPosition = inval;
+				mc->minimumProgress = 0;
+				mc->cmdDriveMotorToPosition(dir, power, targetPosition);
+				if (mc->state != MotorController::engaging)
+				{
+					exitCode = 1;
+					newState_DTP(failure);
+				}
+				else {
+					mc->state = MotorController::driving;
+					newState_DTP(checkDriving);
+				}
+			}
+			else {
+				pp(p_selPos, true);
 			}
 			break;
 	}
