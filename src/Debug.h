@@ -1,3 +1,5 @@
+#ifndef DEBUG_H
+#define DEBUG_H
 /*
 
 //==========Quick remapping===========//
@@ -21,50 +23,30 @@ void BLEPrintln(String s)   {Serial.println(s);}
 void BLEWrite(byte b)       {Serial.write(b);}
 int BLEAvailable()          {return Serial.available();}
 byte BLERead()              {return Serial.read();}
-*/
+ */
 
 //==========Quick remapping===========//
 
-  SoftwareSerial BLE(3, 4); // RX, TX
-  // SoftwareSerial debug(3, 4);
-  
-  void debugBegin(long i)     {Serial.begin(i);}
-  void debugEnd()             {Serial.end();}
-  void debugPrint(String s)   {Serial.print(s);}
-  void debugPrintln(String s) {Serial.println(s);}
-  void debugPrintlnInt(int i) {Serial.println(i);}
-  void debugWrite(byte b)     {Serial.write(b);}
-  int debugAvailable()        {return Serial.available();}
-  byte debugRead()            {return Serial.read();}
-  
-  void BLEBegin(long i)       {BLE.begin(i);}
-  void BLEEnd()               {BLE.end();}
-  void BLEPrint(String s)     {BLE.print(s);}
-  void BLEPrintln(String s)   {BLE.println(s);}
-  void BLEWrite(byte b)       {BLE.write(b);}
-  int BLEAvailable()          {return BLE.available();}
-  byte BLERead()              {
+void debugBegin(long i);
+void debugEnd();
+void debugPrint(String s);
+void debugPrintInt(int i);
+void debugPrint(int i);
+void debugPrintln(String s);
+void debugPrint(const char * s);
+void debugPrintlnInt(int i);
+void debugPrintln(int i);
+void debugWrite(byte b);
+int debugAvailable();
+byte debugRead();
 
-    int data = BLE.read();
-    debugPrint("Got Byte: ");debugPrintlnInt(data);
-    return data;
-    }
-
-//==========Actual functions===========//
-
-void debug_init(){
-  debugBegin(38400);
-}
-
-String readSerial(){
-  String outputString = "";
-  if (debugAvailable()){
-    while (debugAvailable()) {
-      char inChar = (char)debugRead();
-      outputString += inChar;
-    }
-  }
-  if(outputString.length() > 0)
-  {debugPrint("Got String: "); debugPrintln(outputString);}
-  return outputString;
-}
+void BLEBegin(long i);
+void BLEEnd();
+void BLEPrint(String s);
+void BLEPrintln(String s);
+void BLEWrite(byte b);
+int BLEAvailable();
+byte BLERead();
+void debug_init();
+String readSerial();
+#endif

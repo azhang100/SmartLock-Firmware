@@ -58,13 +58,13 @@ void BLE_init()
   BLEBegin(BAUD_RATE);
   delay(BLE_MODE_DELAY);    //wait to reset the ble
   
-  debugPrintln("Setup...");
+  debugPrintln(F("Setup..."));
   sendCommand(7,setup_cmd);
   BLERead();
-  debugPrintln("Bond...");
+  debugPrintln(F("Bond..."));
   sendCommand(6,bond_cmd);
   BLERead();
-  debugPrintln("Mitm...");
+  debugPrintln(F("Mitm..."));
   sendCommand(8,mitm_cmd);  
   BLERead();
 }
@@ -84,17 +84,17 @@ String readBLE() {
         inChar = (char)BLERead(); 
         outputString += inChar;
       }
-    debugPrint("Got String: ");debugPrintln(outputString);  
-    //debugPrint("String Len: ");debugPrintln(outputString.length());
+    debugPrint(F("Got String: "));debugPrintln(outputString);  
+    //debugPrint(F("String Len: "));debugPrintln(outputString.length());
       //return outputString;
     }
     else {
-      debugPrintln("Got Unknown Command");
+      debugPrintln(F("Got Unknown Command"));
       //return outputString;
     }
   }
   if(outputString.length() > 0)
-  {debugPrint("Got String: ");debugPrintln(outputString);}
+  {debugPrint(F("Got String: "));debugPrintln(outputString);}
   return outputString;
 }
 

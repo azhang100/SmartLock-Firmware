@@ -44,21 +44,23 @@ void resetSleepCounter(){
 
 void sleepStart(){
   digitalWrite(13, LOW);
-  digitalWrite(MOTOR_B_SLP, LOW);
+  //digitalWrite(MOTOR_B_SLP, LOW);
+  gLockSystemController.sleep();
   BLEEnd();
   Serial.end();
 }
 
 void sleepEnd(){
   digitalWrite(13,HIGH);
-  digitalWrite(MOTOR_B_SLP, HIGH);
+  //digitalWrite(MOTOR_B_SLP, HIGH);
+  gLockSystemController.wakeUp();
   BLEBegin(BAUD_RATE);
   Serial.begin(9600);
 }
 
 void sleep(){
-  debugPrintln("Entering Sleep mode");
-  BLEPrintln("Entering Sleep mode");
+  debugPrintln(F("Entering Sleep mode"));
+  BLEPrintln(F("Entering Sleep mode"));
   delay(100);     // this delay is needed, the sleep 
                   //function will provoke a Serial error otherwise!!
   resetSleepCounter();
@@ -67,8 +69,8 @@ void sleep(){
   sleepNow();
   sleepEnd();
   
-  debugPrintln("Waking up");
-  BLEPrintln("Waking up");
+  debugPrintln(F("Waking up"));
+  BLEPrintln(F("Waking up"));
 }
 
 void sleepNow(){         // here we put the arduino to sleep DO NOT CALL THIS FUNCTION CALL SLEEP INSTEAD

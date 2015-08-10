@@ -30,16 +30,27 @@ void debugCommandFromUser(String inputString);
 //					FUNCTIONS					 	//
 //**********************************************************************************************//
 
+void motorTime(int duration) {
+	if (duration == 0) {
+		return;
+	}
+	if (duration > 0) {
+		gMotorController.cmdDriveMotorForDuration(MotorController::CW, 255, duration);
+	}
+	else {
+		gMotorController.cmdDriveMotorForDuration(MotorController::CCW, 255, -duration);
+	}
+}
 void executeCommandFromUser(String inputString){
   int ID = inputString[0];
-  debugPrint("ID     : ");debugPrintlnInt(ID);
+	debugPrint(F("ID     : "));debugPrintlnInt(ID);
   if (hasPermissions(ID) == 0){return;}
 
   String command = inputString.substring(1,4);
   String input = inputString.substring(4,inputString.length());
 
-  debugPrint("Command: ");debugPrintln(command);
-  debugPrint("Input  : ");debugPrintln(input);
+	debugPrint(F("Command: "));debugPrintln(command);
+	debugPrint(F("Input  : "));debugPrintln(input);
 
   if (command == "CFG"){
     String settingString = input.substring(0,3);
@@ -53,26 +64,34 @@ void executeCommandFromUser(String inputString){
     else if (settingString == "PAS"){setting = settings.lockPass;}
 
     setting.setData(value.toInt());
-    debugPrint("Set ");debugPrint(settingString);debugPrint(" to ");debugPrintlnInt(value.toInt());
+		debugPrint(F("Set "));debugPrint(settingString);debugPrint(F(" to "));debugPrintlnInt(value.toInt());
   }
   
   else if (command == "CMD"){
-    if      (input.equals("LCK")){controlMotor('l');}
-    else if (input.equals("ULK")){controlMotor('u');}
-    else if (input.equals("LKA")){settings.lockedAngle.setData(getAngle());}
-    else if (input.equals("ULA")){settings.unlockedAngle.setData(getAngle());}
+		if      (input.equals("LCK")){gLockSystemController.cmdLock();}
+		else if (input.equals("ULK")){gLockSystemController.cmdUnlock();}
+		else if (input.equals("LKA")){settings.lockedAngle.setData(gLockAccelerometerObserver.getLockAngleDeg());}
+		else if (input.equals("ULA")){settings.unlockedAngle.setData(gLockAccelerometerObserver.getLockAngleDeg());}
+		else {
+			debugPrint(F("input length "));debugPrintlnInt(input.length());
+		}
   }
   else if (command == "STS"){
-    if(isLocked)
-      debugPrintln("Locked");
+		if(gLockSystemController.isLocked())
+			debugPrintln(F("Locked"));
     else
-      debugPrintln("Unlocked");  
+			debugPrintln(F("Unlocked"));
   }
 } // stringComplete
 
 void debugCommandFromUser(String inputString){
-  if (inputString == "c"){controlMotor('l');}
-  else if (inputString == "o"){controlMotor('u');}
+	if (inputString == "c"){
+		gLockSystemController.cmdLock();
+	}
+	else if (inputString == "o"){
+		//controlMotor('u');
+		gLockSystemController.cmdUnlock();
+	}
   else if (inputString == "l"){
     motorTime(settings.turnTestTime.getData()*10+300);
     motorTime(-settings.turnTestTime.getData()*10);
