@@ -13,15 +13,38 @@
 #include "LockAccelerometerObserver.h"
 #include <math.h>
 
-LockAccelerometerObserver::LockAccelerometerObserver(AccelerometerSubject * subject, float alpha) :
-	AccelerometerObserver(subject, alpha){
+LockAccelerometerObserver::LockAccelerometerObserver(AccelerometerSubject * subject, float alpha, bool xyreverse) :
+	AccelerometerObserver(subject, alpha), revs(0), angle(0), lastAngle(0), xyreverse(xyreverse)
+{
 }
 
 int LockAccelerometerObserver::getLockAngleDeg() {
-	int angle=(180*atan2(filtCart.accX, filtCart.accY)/M_PI);
-	return angle + 180;
+	return angle + 360*revs + 180;
 }
 
+void LockAccelerometerObserver::Update()
+{
+	AccelerometerObserver::Update();
+	lastAngle = angle;
+	if (xyreverse)
+	{
+		angle = (180*atan2(filtCart.accX, filtCart.accY)/M_PI);
+	}
+	else
+	{
+		angle = (180*atan2(filtCart.accY, filtCart.accX)/M_PI);
+	}
+
+	int deltaAngle = angle-lastAngle;
+	if (deltaAngle >= 180)
+	{
+		revs--;
+	}
+	else if (deltaAngle <= -180)
+	{
+		revs++;
+	}
+}
 /*
 void LockAccelerometerObserver::getDoorPosition() {
 
