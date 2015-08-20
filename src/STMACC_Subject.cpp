@@ -3,8 +3,6 @@
 //#include "StringConsts.h"
 #include "Debug.h"
 
-#undef STMACC_DEBUG
-
 STMACC_Subject::STMACC_Subject(ChipAddr ca) :
 	chipAddr(ca), consFaultThresh(20)
 {

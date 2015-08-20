@@ -13,36 +13,70 @@
 #include "LockAccelerometerObserver.h"
 #include <math.h>
 
-LockAccelerometerObserver::LockAccelerometerObserver(AccelerometerSubject * subject, float alpha, bool xyreverse) :
-	AccelerometerObserver(subject, alpha), revs(0), angle(0), lastAngle(0), xyreverse(xyreverse)
+LockAccelerometerObserver::LockAccelerometerObserver(AccelerometerSubject * subject, float alpha) :
+	AccelerometerObserver(subject, alpha),
+	revs_xz(0), revs_yz(0),
+	angle_xz(0), angle_yz(0),
+	axes(yz)
 {
 }
 
-int LockAccelerometerObserver::getLockAngleDeg() {
-	return angle + 360*revs + 180;
+void LockAccelerometerObserver::setDefaultAxes(AxisPairs s)
+{
+	if (s == dflt)
+	{
+		return;
+	}
+	axes = s;
+}
+
+void LockAccelerometerObserver::resetRevolutions()
+{
+	revs_xz = 0;
+	revs_yz = 0;
+}
+
+int LockAccelerometerObserver::getLockAngleDeg(AxisPairs s) {
+	switch (s) {
+		case dflt:
+			return getLockAngleDeg(axes);
+			break;
+		case xz:
+			return angle_xz + 360*revs_xz + 180;
+			break;
+		case yz:
+			return angle_yz + 360*revs_yz + 180;
+			break;
+	}
 }
 
 void LockAccelerometerObserver::Update()
 {
 	AccelerometerObserver::Update();
-	lastAngle = angle;
-	if (xyreverse)
-	{
-		angle = (180*atan2(filtCart.accX, filtCart.accY)/M_PI);
-	}
-	else
-	{
-		angle = (180*atan2(filtCart.accY, filtCart.accX)/M_PI);
-	}
+	int lastAngle_xz = angle_xz;
+	int lastAngle_yz = angle_yz;
 
-	int deltaAngle = angle-lastAngle;
-	if (deltaAngle >= 180)
+	angle_xz = (180*atan2(filtAccel.x, filtAccel.z)/M_PI);
+	angle_yz = (180*atan2(filtAccel.y, filtAccel.z)/M_PI);
+
+	int deltaAngle_xz = angle_xz - lastAngle_xz;
+	int deltaAngle_yz = angle_yz - lastAngle_yz;
+
+	if (deltaAngle_xz >= 180)
 	{
-		revs--;
+		revs_xz--;
 	}
-	else if (deltaAngle <= -180)
+	else if (deltaAngle_xz <= -180)
 	{
-		revs++;
+		revs_xz++;
+	}
+	if (deltaAngle_yz >= 180)
+	{
+		revs_yz--;
+	}
+	else if (deltaAngle_yz <= -180)
+	{
+		revs_yz++;
 	}
 }
 /*

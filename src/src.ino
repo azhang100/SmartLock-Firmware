@@ -18,6 +18,7 @@ int loopsToUpdate = UPDATE_TIME/LOOP_TIME;
 int sleepCount = 0;                   // counter
 long loopsToSleep = SLEEP_TIME/LOOP_TIME;
 
+static const PROGMEM char * const SPACE = " ";
 //**********************************************************************************************//
 //					IMPORTS						 	//
 //**********************************************************************************************//
@@ -27,6 +28,8 @@ long loopsToSleep = SLEEP_TIME/LOOP_TIME;
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
+#include "Config.h"
+#include "Test.h"
 // ============Debug==========
 #include "Debug.h"
 
@@ -35,9 +38,20 @@ long loopsToSleep = SLEEP_TIME/LOOP_TIME;
 #include "Driver_EEPROM.h"
 
 // =============BT===========
+#ifdef HAVE_BLE
 #include "Driver_BLE113.h"
-//#include "Driver_HC05.h"
-//#include "Driver_BLESimSim.h"
+BLE gBLE(BLE_RX, BLE_TX);
+#endif
+
+#include "Battery_config.h"
+#
+#ifdef DO_BATTERY
+#include "BatterySubject.h"
+#include "BatteryObserver.h"
+
+BatterySubject gBattSubj;
+BatteryObserver gBattObs(&gBattSubj);
+#endif
 
 // =============Accelerometer============
 //#include "Accel.h"
@@ -45,8 +59,6 @@ long loopsToSleep = SLEEP_TIME/LOOP_TIME;
 #include "STMACC_Subject.h"
 #include "LockAccelerometerObserver.h"
 
-//LIS3DH_Subject gAccelerometerSubject;
-//STMACC_Subject gAccelerometerSubject(STMACC_Subject::LSM303DLHC);
 STMACC_Subject gAccelerometerSubject(STMACC_Subject::LIS3DH);
 LockAccelerometerObserver gLockAccelerometerObserver(&gAccelerometerSubject);
 
@@ -54,7 +66,6 @@ LockAccelerometerObserver gLockAccelerometerObserver(&gAccelerometerSubject);
 //#include "Motor_Controller.h"
 
 // ============Motor Controller============
-#include "DRV8833_config.h"
 #include "DRV8833_ChannelController.h"
 
 DRV8833_ChannelController gMotorController(MOTOR_IN1, MOTOR_IN2, DRV8833_nSLP, DRV8833_nFAULT, &gLockAccelerometerObserver, -1);
@@ -96,6 +107,9 @@ void loop();
 //					SCHEDULING OBJECTS					//
 Runnable * gSubjects[] = {
 	&gAccelerometerSubject,
+#ifdef DO_BATT
+	&gBattSubj,
+#endif
 	NULL
 };
 
@@ -124,7 +138,7 @@ void setup()
   
 #ifdef HAVE_BLE
 	debugPrintln(F("init ble..."));
-  BLE_init();
+	gBLE.init();
 	debugPrintln(F("done"));
 #endif
   
@@ -139,14 +153,14 @@ void setup()
 	debugPrintln(F("motor hard test"));
 	//motorTime(500);
 	//motorTime(-500);
-	gLockSystemController.cmdLock(); // default params - go to 180
+	//gLockSystemController.cmdLock(); // default params - go to 180
 	// will likely block / fault
-	gLockSystemController.cmdUnlock(); // default params - go to 0
+	//gLockSystemController.cmdUnlock(); // default params - go to 0
 	// will likely block / fault
-	gLockSystemController.cmdLock();
-	gLockSystemController.calibrateLockedPosition();
-	gLockSystemController.cmdUnlock();
-	gLockSystemController.calibrateUnlockedPosition();
+	//gLockSystemController.cmdLock();
+	//gLockSystemController.calibrateLockedPosition();
+	//gLockSystemController.cmdUnlock();
+	//gLockSystemController.calibrateUnlockedPosition();
 	debugPrintln(F("done"));
 	*/
 #endif
@@ -160,15 +174,33 @@ void loop()
   delay(LOOP_TIME);
   loopCount++;
   sleepCount++;
-	int angle = gLockAccelerometerObserver.getLockAngleDeg();
+	int angle_xy = gLockAccelerometerObserver.getLockAngleDeg(xy);
+	int angle_xz = gLockAccelerometerObserver.getLockAngleDeg(xz);
+	int angle_yz = gLockAccelerometerObserver.getLockAngleDeg(yz);
+	Cartesian c;
+	gLockAccelerometerObserver.getCart(&c);
   //update_motor();
   
   if (loopCount == loopsToUpdate){
     loopCount = 0;
     statusLED = !statusLED;
     digitalWrite(13,statusLED);
-		debugPrint(F("Current Orientation: ")); debugPrintln(angle);
+		debugPrint(F("Current Orientation: "));
+		//debugPrint(angle_xy); debugPrint(SPACE);
+		debugPrint(angle_xz); debugPrint(SPACE);
+		debugPrintln(angle_yz);
+		debugPrint(F("Current Acc: "));
+		debugPrint(c.x); debugPrint(SPACE);
+		debugPrint(c.y); debugPrint(SPACE);
+		debugPrintln(c.z);
 		// debugPrint(F("Awake for: ")); debugPrint(sleepCount); debugPrintln(F(" loops"));
+#ifdef DO_BATTERY
+		debugPrint(F("Battery: "));
+		debugPrint(gBattObs.getCurVolts()); debugPrint(SPACE);
+		debugPrint(gBattObs.getAvg100ms()); debugPrint(SPACE);
+		debugPrint(gBattObs.getAvg1s()); debugPrint(SPACE);
+		debugPrintln(gBattObs.getAvg10s());
+#endif
   }
 
   if (sleepCount >= loopsToSleep){sleep();}
@@ -185,7 +217,7 @@ void loop()
   
   String command; // read commands sent by user
 #ifdef HAVE_BLE
-  command=readBLE();
+	command=gBLE.readBLE();
 	receivedCommand(command);
 #endif
   command=readSerial();

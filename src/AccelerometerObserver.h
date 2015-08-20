@@ -14,16 +14,12 @@
 #define _ACCELEROMETEROBSERVER_H
 
 #include "Observer.h"
+#include "Cartesian.h"
 class AccelerometerSubject;
 
 class AccelerometerObserver : public Observer {
 public:
 	AccelerometerObserver( AccelerometerSubject * subject, float alpha = 0.2 );
-	struct Cartesian {
-		int accX, accY, accZ;
-		//int velX, velY, velZ;
-		//int posX, posY, posZ;
-	};
 	struct EulerAngles {
 		// phi, theta, psi
 		// place Euler angles with alpha, omega, theta here
@@ -32,9 +28,9 @@ public:
 	virtual void getCart(Cartesian * cart, int raw = 0);
 //	virtual void getEuler(EulerAngles * euler);
 protected:
-	Cartesian rawCart;
+	Cartesian rawAccel;
 //	EulerAngles rawEuler;
-	Cartesian filtCart;
+	Cartesian filtAccel;
 //	EulerAngles filtEuler;
 	virtual void updateCart();
 //	virtual void updateEuler();

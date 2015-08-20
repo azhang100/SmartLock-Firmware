@@ -5,6 +5,7 @@
 #define           DIGITAL_PIN_2_INT       0 // interrupt that corresponds with digital pin 2
 #define           DIGITAL_PIN_3_INT       1 // interrupt that corresponds with digital pin 2
 
+//TBD: MOVE THESE OUT OF HERE TO PROPER CLASSES:
 #define           WAKE_ACCEL              2 // pin used for waking up
 #define           WAKE_BLE                3
 
@@ -46,7 +47,7 @@ void sleepStart(){
   digitalWrite(13, LOW);
   //digitalWrite(MOTOR_B_SLP, LOW);
   gLockSystemController.sleep();
-  BLEEnd();
+  gBLE.end();
   Serial.end();
 }
 
@@ -54,13 +55,13 @@ void sleepEnd(){
   digitalWrite(13,HIGH);
   //digitalWrite(MOTOR_B_SLP, HIGH);
   gLockSystemController.wakeUp();
-  BLEBegin(BAUD_RATE);
+  gBLE.begin(BAUD_RATE);
   Serial.begin(9600);
 }
 
 void sleep(){
   debugPrintln(F("Entering Sleep mode"));
-  BLEPrintln(F("Entering Sleep mode"));
+  gBLE.println(F("Entering Sleep mode"));
   delay(100);     // this delay is needed, the sleep 
                   //function will provoke a Serial error otherwise!!
   resetSleepCounter();
@@ -70,7 +71,7 @@ void sleep(){
   sleepEnd();
   
   debugPrintln(F("Waking up"));
-  BLEPrintln(F("Waking up"));
+  gBLE.println(F("Waking up"));
 }
 
 void sleepNow(){         // here we put the arduino to sleep DO NOT CALL THIS FUNCTION CALL SLEEP INSTEAD

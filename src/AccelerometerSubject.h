@@ -14,10 +14,12 @@
 #define _ACCELEROMETERSUBJECT_H
 
 #include "Subject.h"
+struct Cartesian;
 
 class AccelerometerSubject : public Subject {
 	public:
 		int getData(int * x, int * y, int * z);
+		int getData(Cartesian * c);
 	protected:
 		struct AccelData {
 			int accX;

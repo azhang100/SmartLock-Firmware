@@ -13,11 +13,9 @@
 #if !defined(_MOTORCONTROLLER_H)
 #define _MOTORCONTROLLER_H
 
+#include "Debug.h"
 #include "Runnable.h"
 #include "LockAccelerometerObserver.h"
-
-#define MOTOR_CONTROLLER_TEST
-#define MOTOR_CONTROLLER_DEBUG
 
 #ifdef MOTOR_CONTROLLER_DEBUG
 #include <Arduino.h>
@@ -76,7 +74,7 @@ class MotorController : public Runnable {
 		void newState(State ns);
 		void stateInfo();
 #ifdef MOTOR_CONTROLLER_DEBUG
-		static const char * const PROGMEM SPACE;
+		static const PROGMEM char * const SPACE;
 #endif
 };
 

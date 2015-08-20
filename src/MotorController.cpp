@@ -24,7 +24,7 @@ MotorController::MotorController(LockAccelerometerObserver * observer,
 		unsigned int minPower, int dirSign) :
 	state(initial), driveMode(Idle), direction(CW),
 	targetAngle(0), targetTime_ms(0), directionSign(dirSign),
-	desiredPower(0), maxEngageTime_ms(500), myObserver(observer),
+	desiredPower(0), maxEngageTime_ms(3500), myObserver(observer),
 	lastTimeSliceAngle(myObserver->getLockAngleDeg()), minimumProgress(10),
 	minPower(minPower), positionThreshhold(10)
 {
@@ -69,11 +69,20 @@ void MotorController::timeSlice() {
 				int currentAngle = myObserver->getLockAngleDeg();
 				int progress = currentAngle - lastTimeSliceAngle;
 				lastTimeSliceAngle = currentAngle;
+				int elapsed = millis() - driveStartTime_ms;
+				if ((driveMode == ForDuration) && (elapsed >= targetTime_ms))
+				{
+#ifdef MOTOR_CONTROLLER_DEBUG
+					debugPrintln(F("MC: over max engage time. Stopping."));
+#endif
+					cmdStop(); // changes state
+					myLSC->motorComplete();
+					return;
+				}
 				if (abs(progress) > minimumProgress) {
 					newState(driving);
 					return;
 				}
-				int elapsed = millis() - driveStartTime_ms;
 				if (elapsed > maxEngageTime_ms)
 				{
 					cmdCoast();
@@ -176,6 +185,7 @@ void MotorController::cmdDriveMotorToPosition(Direction direction, int power, in
 		case coasting:
 		case engaging:
 		case driving:
+		case blocked:
 			{
 				if ((state == driving) && (this->direction == direction))
 				{
@@ -191,11 +201,6 @@ void MotorController::cmdDriveMotorToPosition(Direction direction, int power, in
 				driveStartTime_ms = millis();
 				desiredPower = power;
 				applyMotorDriveCommands();
-				return;
-			}
-			break;
-		case blocked:
-			{
 				return;
 			}
 			break;
@@ -220,6 +225,7 @@ void MotorController::cmdDriveMotorForDuration(Direction direction, int power, u
 		case stopped:
 		case coasting:
 		case engaging:
+		case blocked:
 			{
 				lastTimeSliceAngle = myObserver->getLockAngleDeg();
 				targetTime_ms = targetMs;
@@ -251,11 +257,6 @@ void MotorController::cmdDriveMotorForDuration(Direction direction, int power, u
 				{
 					newState(engaging);
 				}
-				return;
-			}
-			break;
-		case blocked:
-			{
 				return;
 			}
 			break;

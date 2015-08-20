@@ -70,17 +70,18 @@ void executeCommandFromUser(String inputString){
   else if (command == "CMD"){
 		if      (input.equals("LCK")){gLockSystemController.cmdLock();}
 		else if (input.equals("ULK")){gLockSystemController.cmdUnlock();}
+		/*
 		else if (input.equals("LKA")){settings.lockedAngle.setData(gLockAccelerometerObserver.getLockAngleDeg());}
 		else if (input.equals("ULA")){settings.unlockedAngle.setData(gLockAccelerometerObserver.getLockAngleDeg());}
+		*/
+		else if (input.equals("LKA")) { gLockSystemController.cmdCalibAtLockedPos(); }
+		else if (input.equals("ULA")) { gLockSystemController.cmdCalibAtUnlockedPos(); }
 		else {
 			debugPrint(F("input length "));debugPrintlnInt(input.length());
 		}
   }
   else if (command == "STS"){
-		if(gLockSystemController.isLocked())
-			debugPrintln(F("Locked"));
-    else
-			debugPrintln(F("Unlocked"));
+		gLockSystemController.stateInfo();
   }
 } // stringComplete
 

@@ -23,14 +23,13 @@ AccelerometerObserver::AccelerometerObserver( AccelerometerSubject * subject, fl
 void AccelerometerObserver::Update() {
 
 	AccelerometerSubject * subj = (AccelerometerSubject *) mySubject;
-	int retVal = subj->getData(&rawCart.accX, &rawCart.accY, &rawCart.accZ);
+	int retVal = subj->getData(&rawAccel);
 
-#undef ACCELEROMETER_OBSERVER_DEBUG
 #ifdef ACCELEROMETER_OBSERVER_DEBUG
 	debugPrint(F("AccelerometerObserver Update: x y z ret "));
-	debugPrint(rawCart.accX); debugPrint(SPACE);
-	debugPrint(rawCart.accY); debugPrint(SPACE);
-	debugPrint(rawCart.accZ); debugPrint(SPACE);
+	debugPrint(rawAccel.x); debugPrint(SPACE);
+	debugPrint(rawAccel.y); debugPrint(SPACE);
+	debugPrint(rawAccel.z); debugPrint(SPACE);
 	debugPrint(retVal); debugPrint(SPACE);
 	debugPrintln();
 #endif
@@ -45,9 +44,9 @@ void AccelerometerObserver::Update() {
 void AccelerometerObserver::getCart(Cartesian * cart, int raw)
 {
 	if (raw) {
-		*cart = rawCart;
+		*cart = rawAccel;
 	} else {
-		*cart = filtCart;
+		*cart = filtAccel;
 	}
 }
 
@@ -59,9 +58,9 @@ void AccelerometerObserver::getCart(Cartesian * cart, int raw)
 
 void AccelerometerObserver::updateCart() {
 	// we have new raw data, update filtered values
-	filtCart.accX = filtCart.accX * (1-LPFalpha) + rawCart.accX * LPFalpha;
-	filtCart.accY = filtCart.accY * (1-LPFalpha) + rawCart.accY * LPFalpha;
-	filtCart.accZ = filtCart.accZ * (1-LPFalpha) + rawCart.accZ * LPFalpha;
+	filtAccel.x = filtAccel.x * (1-LPFalpha) + rawAccel.x * LPFalpha;
+	filtAccel.y = filtAccel.y * (1-LPFalpha) + rawAccel.y * LPFalpha;
+	filtAccel.z = filtAccel.z * (1-LPFalpha) + rawAccel.z * LPFalpha;
 }
 
 /*

@@ -14,20 +14,24 @@
 #define _LOCKACCELEROMETEROBSERVER_H
 
 #include "AccelerometerObserver.h"
+#include "AxisPairs.h"
 
 class LockAccelerometerObserver : public AccelerometerObserver {
 public:
-	LockAccelerometerObserver(AccelerometerSubject * subject, float alpha = 0.2, bool xyreverse = false);
-	virtual int getLockAngleDeg();
+	LockAccelerometerObserver(AccelerometerSubject * subject, float alpha = 0.2);
+	virtual int getLockAngleDeg( AxisPairs s = dflt);
 	// TBD virtual void getDoorPosition();
 	// TBD virtual void getLockOmega();
 	// TBD virtual void getLockAlpha();
 	virtual void Update();
+	virtual void setDefaultAxes(AxisPairs s);
+	virtual void resetRevolutions();
 protected:
-	int revs;
-	int angle;
-	int lastAngle;
-	bool xyreverse;
+	int revs_xz;
+	int revs_yz;
+	int angle_xz;
+	int angle_yz;
+	AxisPairs axes;
 
 };
 
